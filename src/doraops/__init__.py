@@ -32,6 +32,21 @@ from .risk import (
     assess_ict_risk,
     assert_risk_decision_current,
 )
+from .incident import (
+    ClientTransactionImpact,
+    DataLossImpact,
+    IncidentClassification,
+    IncidentEvent,
+    IncidentEventType,
+    IncidentImpactSnapshot,
+    IncidentRecord,
+    IncidentTimeline,
+    MaterialityThreshold,
+    ReputationalImpact,
+    append_incident_event,
+    assert_incident_classification_current,
+    classify_incident,
+)
 
 __all__ = [
     "canonical_json",
@@ -63,6 +78,19 @@ __all__ = [
     "TreatmentType",
     "assess_ict_risk",
     "assert_risk_decision_current",
+    "ClientTransactionImpact",
+    "DataLossImpact",
+    "IncidentClassification",
+    "IncidentEvent",
+    "IncidentEventType",
+    "IncidentImpactSnapshot",
+    "IncidentRecord",
+    "IncidentTimeline",
+    "MaterialityThreshold",
+    "ReputationalImpact",
+    "append_incident_event",
+    "assert_incident_classification_current",
+    "classify_incident",
 ]
 
-__version__ = "0.1.0.dev2"
+__version__ = "0.1.0.dev3"
