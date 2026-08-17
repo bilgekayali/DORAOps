@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/third-party-provider.schema.json",
+  "title": "DORAOps ICT Third-Party Provider",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "provider_id", "legal_name", "identifier_type", "identifier_value"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "provider_id": {"type": "string", "minLength": 1},
+    "legal_name": {"type": "string", "minLength": 1},
+    "identifier_type": {"type": "string", "minLength": 1},
+    "identifier_value": {"type": "string", "minLength": 1}
+  }
+}
