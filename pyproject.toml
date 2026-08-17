@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "doraops"
+version = "0.1.0"
+description = "Evidence-backed digital operational resilience and ICT third-party risk governance for financial entities"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Bilge Kayalı" }]
+license = { text = "Apache-2.0" }
+dependencies = []
+keywords = ["dora", "ict-risk", "third-party-risk", "operational-resilience", "financial-services"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

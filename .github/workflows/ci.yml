@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "agent/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e .
+      - run: python -m unittest discover -s tests -v
+      - name: Enforce offline register core
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          banned = {"asyncio", "http", "requests", "socket", "subprocess", "urllib"}
+          for path in [Path("src/doraops/models.py"), Path("src/doraops/register.py")]:
+              tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.Import): roots = {a.name.split('.')[0] for a in node.names}
+                  elif isinstance(node, ast.ImportFrom) and node.module: roots = {node.module.split('.')[0]}
+                  else: continue
+                  if roots & banned: raise SystemExit(f"{path}: forbidden capability import")
+          PY
+
+  package-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install build && python -m build
+      - run: |
+          python -m venv /tmp/doraops-smoke
+          /tmp/doraops-smoke/bin/python -m pip install dist/*.whl
+          /tmp/doraops-smoke/bin/python - <<'PY'
+          import doraops
+          from doraops.register import RegisterValidator
+          assert doraops.__version__ == "0.1.0"
+          assert RegisterValidator is not None
+          PY
