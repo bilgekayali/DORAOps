@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterable
 
 from .canonical import sha256_digest
 from .inventory import (
@@ -263,6 +262,7 @@ class IncidentImpactSnapshot:
     impacted_member_states: tuple[str, ...]
     economic_costs_and_losses_eur: int
     authorised_registered_or_supervised_financial_service_affected: bool = False
+    successful_malicious_unauthorised_access: bool = False
 
     def __post_init__(self) -> None:
         _nonnegative("duration_minutes", self.duration_minutes)
@@ -277,6 +277,13 @@ class IncidentImpactSnapshot:
         if len(states) != len(set(states)):
             raise GovernanceError("impacted_member_states must be unique")
         object.__setattr__(self, "impacted_member_states", tuple(sorted(states)))
+        if (
+            self.data_loss.successful_malicious_unauthorised_access_with_potential_data_loss
+            and not self.successful_malicious_unauthorised_access
+        ):
+            raise GovernanceError(
+                "potential-data-loss malicious access requires successful_malicious_unauthorised_access"
+            )
 
     @property
     def evidence_digest(self) -> str:
@@ -367,11 +374,12 @@ def classify_incident(
     for ref in incident.affected_nodes:
         registry.node(ref)
 
+    critical_function_affected = _critical_function_affected(registry, incident)
     critical_services_affected = any(
         (
-            _critical_function_affected(registry, incident),
+            critical_function_affected,
             impact.authorised_registered_or_supervised_financial_service_affected,
-            impact.data_loss.successful_malicious_unauthorised_access_with_potential_data_loss,
+            impact.successful_malicious_unauthorised_access,
         )
     )
 
@@ -380,7 +388,10 @@ def classify_incident(
         thresholds.append(MaterialityThreshold.CLIENTS_COUNTERPARTIES_TRANSACTIONS)
     if impact.reputation.threshold_met:
         thresholds.append(MaterialityThreshold.REPUTATIONAL_IMPACT)
-    if impact.duration_minutes > 24 * 60 or impact.critical_function_service_downtime_minutes > 2 * 60:
+    if impact.duration_minutes > 24 * 60 or (
+        critical_function_affected
+        and impact.critical_function_service_downtime_minutes > 2 * 60
+    ):
         thresholds.append(MaterialityThreshold.DURATION_OR_DOWNTIME)
     if len(impact.impacted_member_states) >= 2:
         thresholds.append(MaterialityThreshold.GEOGRAPHICAL_SPREAD)
@@ -432,22 +443,3 @@ def assert_incident_classification_current(
         raise GovernanceError("incident classification is stale for current incident record")
     if classification.impact_snapshot_digest != impact.evidence_digest:
         raise GovernanceError("incident classification is stale for current impact snapshot")
-
-
-def classify_recurring_incidents(
-    classifications: Iterable[IncidentClassification],
-    incidents: Iterable[IncidentRecord],
-    *,
-    within_seconds: int = 6 * 31 * 24 * SECONDS_PER_HOUR,
-) -> bool:
-    classification_list = tuple(classifications)
-    incident_list = tuple(incidents)
-    if len(classification_list) != len(incident_list) or len(incident_list) < 2:
-        return False
-    root_causes = {incident.apparent_root_cause for incident in incident_list}
-    if None in root_causes or len(root_causes) != 1:
-        return False
-    detection_times = sorted(incident.detected_at for incident in incident_list)
-    if detection_times[-1] - detection_times[0] > within_seconds:
-        return False
-    return any(classification.major_incident for classification in classification_list)
