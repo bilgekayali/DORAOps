@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/financial-entity.schema.json",
+  "title": "DORAOps Financial Entity",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "legal_name", "country_code", "lei"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "legal_name": {"type": "string", "minLength": 1},
+    "country_code": {"type": "string", "pattern": "^[A-Z]{2}$"},
+    "lei": {
+      "oneOf": [
+        {"type": "string", "pattern": "^[A-Z0-9]{20}$"},
+        {"type": "null"}
+      ]
+    }
+  }
+}

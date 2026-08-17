@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/dependency-edge.schema.json",
+  "title": "DORAOps Dependency Edge",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "edge_id", "source", "target", "relationship", "rationale"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "edge_id": {"type": "string", "minLength": 1},
+    "source": {"$ref": "#/$defs/node_ref"},
+    "target": {"$ref": "#/$defs/node_ref"},
+    "relationship": {"enum": ["supported_by", "depends_on", "processed_by", "hosted_on", "provided_by"]},
+    "rationale": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "node_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "kind", "node_id"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["business_function", "business_process", "ict_service", "information_asset", "ict_asset", "third_party_service"]},
+        "node_id": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
