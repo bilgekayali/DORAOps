@@ -18,6 +18,20 @@ from .inventory import (
     ThirdPartyProvider,
     ThirdPartyService,
 )
+from .risk import (
+    ControlEffectiveness,
+    ICTControlObservation,
+    ICTRiskDecision,
+    ICTRiskPolicy,
+    ICTRiskScenario,
+    Impact,
+    Likelihood,
+    RiskLevel,
+    RiskTreatmentPlan,
+    TreatmentType,
+    assess_ict_risk,
+    assert_risk_decision_current,
+)
 
 __all__ = [
     "canonical_json",
@@ -37,6 +51,18 @@ __all__ = [
     "NodeRef",
     "ThirdPartyProvider",
     "ThirdPartyService",
+    "ControlEffectiveness",
+    "ICTControlObservation",
+    "ICTRiskDecision",
+    "ICTRiskPolicy",
+    "ICTRiskScenario",
+    "Impact",
+    "Likelihood",
+    "RiskLevel",
+    "RiskTreatmentPlan",
+    "TreatmentType",
+    "assess_ict_risk",
+    "assert_risk_decision_current",
 ]
 
-__version__ = "0.1.0.dev1"
+__version__ = "0.1.0.dev2"
