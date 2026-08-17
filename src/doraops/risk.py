@@ -162,8 +162,8 @@ class ICTRiskDecision:
             object.__setattr__(self, name, _text(name, getattr(self, name)))
         for name in ("inventory_snapshot_digest", "scenario_digest", "policy_digest"):
             _digest(name, getattr(self, name))
-        if any(len(value) != 64 for value in self.control_digests):
-            raise GovernanceError("control_digests must contain SHA-256 digests")
+        for value in self.control_digests:
+            _digest("control digest", value)
         if len(self.control_digests) != len(set(self.control_digests)):
             raise GovernanceError("control_digests must be unique")
 
@@ -182,6 +182,19 @@ def _level(score: int, policy: ICTRiskPolicy) -> RiskLevel:
     return RiskLevel.LOW
 
 
+def _normalize_controls(
+    controls: Iterable[ICTControlObservation],
+    entity_id: str,
+) -> tuple[ICTControlObservation, ...]:
+    control_list = tuple(sorted(controls, key=lambda item: item.control_id))
+    if any(control.entity_id != entity_id for control in control_list):
+        raise GovernanceError("ICT control observation is outside the scenario entity scope")
+    control_ids = tuple(control.control_id for control in control_list)
+    if len(control_ids) != len(set(control_ids)):
+        raise GovernanceError("ICT control observations must not repeat control_id")
+    return control_list
+
+
 def assess_ict_risk(
     registry: InventoryRegistry,
     scenario: ICTRiskScenario,
@@ -196,12 +209,7 @@ def assess_ict_risk(
         registry.node(ref)
 
     inventory_digest = registry.snapshot_digest(scenario.entity_id)
-    control_list = tuple(sorted(controls, key=lambda item: item.control_id))
-    if any(control.entity_id != scenario.entity_id for control in control_list):
-        raise GovernanceError("ICT control observation is outside the scenario entity scope")
-    control_ids = tuple(control.control_id for control in control_list)
-    if len(control_ids) != len(set(control_ids)):
-        raise GovernanceError("ICT control observations must not repeat control_id")
+    control_list = _normalize_controls(controls, scenario.entity_id)
 
     inherent_score = int(scenario.likelihood) * int(scenario.impact)
     inherent_level = _level(inherent_score, policy)
@@ -238,6 +246,7 @@ def assert_risk_decision_current(
     decision: ICTRiskDecision,
     registry: InventoryRegistry,
     scenario: ICTRiskScenario,
+    controls: Iterable[ICTControlObservation],
     policy: ICTRiskPolicy,
 ) -> None:
     if decision.entity_id != scenario.entity_id or decision.scenario_id != scenario.scenario_id:
@@ -248,3 +257,7 @@ def assert_risk_decision_current(
         raise GovernanceError("ICT risk decision is stale for current scenario")
     if decision.policy_digest != policy.evidence_digest:
         raise GovernanceError("ICT risk decision is stale for current risk policy")
+    control_list = _normalize_controls(controls, scenario.entity_id)
+    current_control_digests = tuple(control.governance_digest for control in control_list)
+    if decision.control_digests != current_control_digests:
+        raise GovernanceError("ICT risk decision is stale for current control evidence")
