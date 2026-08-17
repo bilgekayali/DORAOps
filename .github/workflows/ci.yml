@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Upgrade packaging tools
+        run: python -m pip install --upgrade pip build
+      - name: Install package and test dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Run tests
+        run: python -m pytest
+      - name: Build wheel
+        run: python -m build --wheel
+      - name: Clean-wheel smoke
+        shell: bash
+        run: |
+          python -m venv /tmp/doraops-wheel
+          /tmp/doraops-wheel/bin/python -m pip install --upgrade pip
+          /tmp/doraops-wheel/bin/python -m pip install dist/*.whl
+          /tmp/doraops-wheel/bin/python - <<'PY'
+          import doraops
+          assert doraops.__version__ == "0.1.0.dev1"
+          print(doraops.__version__)
+          PY
