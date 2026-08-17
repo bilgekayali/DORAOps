@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/ict-incident.schema.json",
+  "title": "DORAOps ICT Incident Governance Artifact",
+  "oneOf": [
+    {"$ref": "#/$defs/incident_record"},
+    {"$ref": "#/$defs/incident_event"},
+    {"$ref": "#/$defs/incident_timeline"},
+    {"$ref": "#/$defs/impact_snapshot"},
+    {"$ref": "#/$defs/classification"}
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "node_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "kind", "node_id"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["business_function", "business_process", "ict_service", "information_asset", "ict_asset", "third_party_service"]},
+        "node_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "incident_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "incident_id", "title", "detected_at", "affected_nodes", "occurred_at", "apparent_root_cause"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "incident_id": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "detected_at": {"type": "integer", "minimum": 0},
+        "affected_nodes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/node_ref"}},
+        "occurred_at": {"type": ["integer", "null"], "minimum": 0},
+        "apparent_root_cause": {"type": ["string", "null"], "minLength": 1}
+      }
+    },
+    "incident_event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "incident_id", "sequence", "event_type", "occurred_at", "recorded_at", "summary", "evidence_digest", "previous_event_digest"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "incident_id": {"type": "string", "minLength": 1},
+        "sequence": {"type": "integer", "minimum": 0},
+        "event_type": {"enum": ["occurred", "detected", "updated", "contained", "recovered", "root_cause_identified", "resolved"]},
+        "occurred_at": {"type": "integer", "minimum": 0},
+        "recorded_at": {"type": "integer", "minimum": 0},
+        "summary": {"type": "string", "minLength": 1},
+        "evidence_digest": {"$ref": "#/$defs/sha256"},
+        "previous_event_digest": {
+          "oneOf": [
+            {"$ref": "#/$defs/sha256"},
+            {"type": "null"}
+          ]
+        }
+      }
+    },
+    "incident_timeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "incident_id", "events"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "incident_id": {"type": "string", "minLength": 1},
+        "events": {"type": "array", "items": {"$ref": "#/$defs/incident_event"}}
+      }
+    },
+    "clients_transactions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["affected_clients", "total_clients_using_service", "affected_financial_counterparties", "total_financial_counterparties", "affected_transactions", "daily_average_transactions", "affected_transaction_value_eur", "daily_average_transaction_value_eur", "relevant_client_or_counterparty_affected", "estimated"],
+      "properties": {
+        "affected_clients": {"type": "integer", "minimum": 0},
+        "total_clients_using_service": {"type": "integer", "minimum": 0},
+        "affected_financial_counterparties": {"type": "integer", "minimum": 0},
+        "total_financial_counterparties": {"type": "integer", "minimum": 0},
+        "affected_transactions": {"type": "integer", "minimum": 0},
+        "daily_average_transactions": {"type": "integer", "minimum": 0},
+        "affected_transaction_value_eur": {"type": "integer", "minimum": 0},
+        "daily_average_transaction_value_eur": {"type": "integer", "minimum": 0},
+        "relevant_client_or_counterparty_affected": {"type": "boolean"},
+        "estimated": {"type": "boolean"}
+      }
+    },
+    "reputation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reflected_in_media", "repetitive_client_or_counterparty_complaints", "regulatory_requirements_at_risk", "material_client_or_counterparty_loss_likely"],
+      "properties": {
+        "reflected_in_media": {"type": "boolean"},
+        "repetitive_client_or_counterparty_complaints": {"type": "boolean"},
+        "regulatory_requirements_at_risk": {"type": "boolean"},
+        "material_client_or_counterparty_loss_likely": {"type": "boolean"}
+      }
+    },
+    "data_loss": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["availability_impacted", "authenticity_impacted", "integrity_impacted", "confidentiality_impacted", "adverse_business_or_regulatory_impact", "successful_malicious_unauthorised_access_with_potential_data_loss"],
+      "properties": {
+        "availability_impacted": {"type": "boolean"},
+        "authenticity_impacted": {"type": "boolean"},
+        "integrity_impacted": {"type": "boolean"},
+        "confidentiality_impacted": {"type": "boolean"},
+        "adverse_business_or_regulatory_impact": {"type": "boolean"},
+        "successful_malicious_unauthorised_access_with_potential_data_loss": {"type": "boolean"}
+      }
+    },
+    "impact_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["clients_transactions", "reputation", "data_loss", "duration_minutes", "critical_function_service_downtime_minutes", "impacted_member_states", "economic_costs_and_losses_eur", "authorised_registered_or_supervised_financial_service_affected", "successful_malicious_unauthorised_access"],
+      "properties": {
+        "clients_transactions": {"$ref": "#/$defs/clients_transactions"},
+        "reputation": {"$ref": "#/$defs/reputation"},
+        "data_loss": {"$ref": "#/$defs/data_loss"},
+        "duration_minutes": {"type": "integer", "minimum": 0},
+        "critical_function_service_downtime_minutes": {"type": "integer", "minimum": 0},
+        "impacted_member_states": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z]{2}$"}},
+        "economic_costs_and_losses_eur": {"type": "integer", "minimum": 0},
+        "authorised_registered_or_supervised_financial_service_affected": {"type": "boolean"},
+        "successful_malicious_unauthorised_access": {"type": "boolean"}
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "incident_id", "inventory_snapshot_digest", "incident_digest", "impact_snapshot_digest", "classified_at", "critical_services_affected", "materiality_thresholds", "direct_malicious_access_trigger", "major_incident", "initial_notification_due_at"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "incident_id": {"type": "string", "minLength": 1},
+        "inventory_snapshot_digest": {"$ref": "#/$defs/sha256"},
+        "incident_digest": {"$ref": "#/$defs/sha256"},
+        "impact_snapshot_digest": {"$ref": "#/$defs/sha256"},
+        "classified_at": {"type": "integer", "minimum": 0},
+        "critical_services_affected": {"type": "boolean"},
+        "materiality_thresholds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["clients_counterparties_transactions", "reputational_impact", "duration_or_downtime", "geographical_spread", "data_loss", "economic_impact"]}
+        },
+        "direct_malicious_access_trigger": {"type": "boolean"},
+        "major_incident": {"type": "boolean"},
+        "initial_notification_due_at": {"type": ["integer", "null"], "minimum": 0}
+      }
+    }
+  }
+}
