@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/inventory-node.schema.json",
+  "title": "DORAOps Inventory Node",
+  "oneOf": [
+    {"$ref": "#/$defs/business_function"},
+    {"$ref": "#/$defs/business_process"},
+    {"$ref": "#/$defs/ict_service"},
+    {"$ref": "#/$defs/information_asset"},
+    {"$ref": "#/$defs/ict_asset"},
+    {"$ref": "#/$defs/third_party_service"}
+  ],
+  "$defs": {
+    "business_function": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "function_id", "name", "classification", "decision_owner", "classification_rationale"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "function_id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "classification": {"enum": ["standard", "critical_or_important"]},
+        "decision_owner": {"type": "string", "minLength": 1},
+        "classification_rationale": {"type": "string", "minLength": 1}
+      }
+    },
+    "business_process": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "process_id", "name", "owner_id"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "process_id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "owner_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "ict_service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "service_id", "name", "owner_id", "service_type"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "service_id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "owner_id": {"type": "string", "minLength": 1},
+        "service_type": {"type": "string", "minLength": 1}
+      }
+    },
+    "information_asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "asset_id", "name", "owner_id", "classification"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "asset_id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "owner_id": {"type": "string", "minLength": 1},
+        "classification": {"type": "string", "minLength": 1}
+      }
+    },
+    "ict_asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "asset_id", "name", "owner_id", "asset_type", "legacy"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "asset_id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "owner_id": {"type": "string", "minLength": 1},
+        "asset_type": {"type": "string", "minLength": 1},
+        "legacy": {"type": "boolean"}
+      }
+    },
+    "third_party_service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "third_party_service_id", "provider_id", "name", "service_type", "direct_provider", "supply_chain_rank", "parent_third_party_service_id"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "third_party_service_id": {"type": "string", "minLength": 1},
+        "provider_id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "service_type": {"type": "string", "minLength": 1},
+        "direct_provider": {"type": "boolean"},
+        "supply_chain_rank": {"type": "integer", "minimum": 1},
+        "parent_third_party_service_id": {"type": ["string", "null"], "minLength": 1}
+      }
+    }
+  }
+}
