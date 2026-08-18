@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/continuity-exercise.schema.json",
+  "title": "DORAOps Continuity Exercise Evidence",
+  "oneOf": [
+    {"$ref": "#/$defs/plan"},
+    {"$ref": "#/$defs/execution"},
+    {"$ref": "#/$defs/observation"}
+  ],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "nodeRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "kind", "node_id"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["business_function", "business_process", "ict_service", "information_asset", "ict_asset", "third_party_service"]},
+        "node_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity_id", "exercise_id", "title", "objective_digest", "objective_target",
+        "inventory_snapshot_digest", "owner_id", "independent_reviewer_id", "scenario",
+        "activation_assumptions", "scope_nodes", "planned_at"
+      ],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "exercise_id": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "objective_digest": {"$ref": "#/$defs/digest"},
+        "objective_target": {"$ref": "#/$defs/nodeRef"},
+        "inventory_snapshot_digest": {"$ref": "#/$defs/digest"},
+        "owner_id": {"type": "string", "minLength": 1},
+        "independent_reviewer_id": {"type": ["string", "null"], "minLength": 1},
+        "scenario": {"type": "string", "minLength": 1},
+        "activation_assumptions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "scope_nodes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/nodeRef"}},
+        "planned_at": {"type": "integer", "minimum": 0}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plan_digest", "execution_id", "started_at", "completed_at", "executor_id", "evidence_digests", "notes"],
+      "properties": {
+        "plan_digest": {"$ref": "#/$defs/digest"},
+        "execution_id": {"type": "string", "minLength": 1},
+        "started_at": {"type": "integer", "minimum": 0},
+        "completed_at": {"type": "integer", "minimum": 0},
+        "executor_id": {"type": "string", "minLength": 1},
+        "evidence_digests": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/digest"}},
+        "notes": {"type": "string", "minLength": 1}
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_digest", "execution_digest", "observation_id", "observed_at", "observer_id",
+        "restoration_time_seconds", "recovery_point_loss_seconds", "achieved_service_level_basis_points",
+        "evidence_digests"
+      ],
+      "properties": {
+        "plan_digest": {"$ref": "#/$defs/digest"},
+        "execution_digest": {"$ref": "#/$defs/digest"},
+        "observation_id": {"type": "string", "minLength": 1},
+        "observed_at": {"type": "integer", "minimum": 0},
+        "observer_id": {"type": "string", "minLength": 1},
+        "restoration_time_seconds": {"type": ["integer", "null"], "minimum": 0},
+        "recovery_point_loss_seconds": {"type": ["integer", "null"], "minimum": 0},
+        "achieved_service_level_basis_points": {"type": ["integer", "null"], "minimum": 0, "maximum": 10000},
+        "evidence_digests": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/digest"}}
+      }
+    }
+  }
+}
