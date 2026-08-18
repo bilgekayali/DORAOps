@@ -70,6 +70,24 @@ from .resilience import (
     record_test_execution,
     resolve_test,
 )
+from .third_party import (
+    ConcentrationAssessment,
+    DependencyObservation,
+    ExitTransitionPlan,
+    GeographicLocation,
+    ProviderDesignation,
+    RegisterAssessmentState,
+    SubstitutabilityAssessment,
+    ThirdPartyArrangement,
+    ThirdPartyGap,
+    ThirdPartyGapCode,
+    ThirdPartyGovernancePolicy,
+    ThirdPartyRegister,
+    ThirdPartyRegisterRow,
+    ThirdPartyRegisterSnapshot,
+    build_register_snapshot,
+    build_third_party_arrangement,
+)
 
 __all__ = [
     "canonical_json",
@@ -135,6 +153,22 @@ __all__ = [
     "create_retest",
     "record_test_execution",
     "resolve_test",
+    "ConcentrationAssessment",
+    "DependencyObservation",
+    "ExitTransitionPlan",
+    "GeographicLocation",
+    "ProviderDesignation",
+    "RegisterAssessmentState",
+    "SubstitutabilityAssessment",
+    "ThirdPartyArrangement",
+    "ThirdPartyGap",
+    "ThirdPartyGapCode",
+    "ThirdPartyGovernancePolicy",
+    "ThirdPartyRegister",
+    "ThirdPartyRegisterRow",
+    "ThirdPartyRegisterSnapshot",
+    "build_register_snapshot",
+    "build_third_party_arrangement",
 ]
 
-__version__ = "0.1.0.dev4"
+__version__ = "0.1.0.dev5"
