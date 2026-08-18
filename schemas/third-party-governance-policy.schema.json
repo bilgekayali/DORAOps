@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/third-party-governance-policy.schema.json",
+  "title": "DORAOps ICT Third-Party Governance Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "policy_id", "version", "require_provider_designation_assessed", "require_data_location", "require_service_location", "require_contract_evidence", "require_control_requirement_evidence", "require_dependency_observation", "max_observation_age", "require_exit_plan_for_critical_functions", "require_exit_plan_for_high_concentration", "require_exit_plan_for_difficult_substitutability"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "policy_id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "minLength": 1},
+    "require_provider_designation_assessed": {"type": "boolean"},
+    "require_data_location": {"type": "boolean"},
+    "require_service_location": {"type": "boolean"},
+    "require_contract_evidence": {"type": "boolean"},
+    "require_control_requirement_evidence": {"type": "boolean"},
+    "require_dependency_observation": {"type": "boolean"},
+    "max_observation_age": {"oneOf": [{"type": "null"}, {"type": "integer", "minimum": 0}]},
+    "require_exit_plan_for_critical_functions": {"type": "boolean"},
+    "require_exit_plan_for_high_concentration": {"type": "boolean"},
+    "require_exit_plan_for_difficult_substitutability": {"type": "boolean"}
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/third-party-register-snapshot.schema.json",
+  "title": "DORAOps ICT Third-Party Register Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "inventory_snapshot_digest", "policy_digest", "as_of", "mapping_profile", "arrangement_digests", "observation_digests", "exit_plan_digests", "rows", "gaps", "state"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "inventory_snapshot_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "policy_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "as_of": {"type": "integer", "minimum": 0},
+    "mapping_profile": {"const": "EU-2024-2956-support-v1"},
+    "arrangement_digests": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "observation_digests": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "exit_plan_digests": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "rows": {"type": "array", "items": {"$ref": "#/$defs/row"}},
+    "gaps": {"type": "array", "items": {"$ref": "#/$defs/gap"}},
+    "state": {"enum": ["complete", "with_gaps"]}
+  },
+  "$defs": {
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["arrangement_id", "arrangement_digest", "direct_provider_id", "service_id", "direct_service", "supply_chain_rank", "parent_service_id", "supported_function_ids", "critical_or_important_function_ids", "provider_designation", "data_country_codes", "service_country_codes"],
+      "properties": {
+        "arrangement_id": {"type": "string", "minLength": 1},
+        "arrangement_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "direct_provider_id": {"type": "string", "minLength": 1},
+        "service_id": {"type": "string", "minLength": 1},
+        "direct_service": {"type": "boolean"},
+        "supply_chain_rank": {"type": "integer", "minimum": 1},
+        "parent_service_id": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]},
+        "supported_function_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "critical_or_important_function_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "provider_designation": {"enum": ["unassessed", "not_designated_critical", "designated_critical"]},
+        "data_country_codes": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z]{2}$"}},
+        "service_country_codes": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z]{2}$"}}
+      }
+    },
+    "gap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["arrangement_id", "code", "detail"],
+      "properties": {
+        "arrangement_id": {"type": "string", "minLength": 1},
+        "code": {"enum": ["provider_designation_unassessed", "missing_data_location", "missing_service_location", "missing_contract_evidence", "missing_control_requirement_evidence", "missing_dependency_observation", "stale_dependency_observation", "substitutability_not_assessed", "concentration_not_assessed", "missing_exit_plan"]},
+        "detail": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
