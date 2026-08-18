@@ -36,6 +36,13 @@ jobs:
           /tmp/doraops-wheel/bin/python -m pip install dist/*.whl
           /tmp/doraops-wheel/bin/python - <<'PY'
           import doraops
-          assert doraops.__version__ == "0.1.0.dev5"
+          assert doraops.__version__ == "0.1.0"
           print(doraops.__version__)
           PY
+          /tmp/doraops-wheel/bin/doraops --version
+          printf '{"b":2,"a":1}\n' > /tmp/doraops-document.json
+          /tmp/doraops-wheel/bin/doraops digest /tmp/doraops-document.json
+          cat > /tmp/doraops-schema.json <<'JSON'
+          {"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","required":["a"],"properties":{"a":{"type":"integer"}}}
+          JSON
+          /tmp/doraops-wheel/bin/doraops schema /tmp/doraops-schema.json /tmp/doraops-document.json
