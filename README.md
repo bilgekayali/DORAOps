@@ -8,33 +8,57 @@ DORAOps is an open-source reference architecture for structuring and evidencing 
 
 The project is not a legal-compliance engine, supervisory reporting service, regulator filing gateway, or certification product.
 
-## Current implementation — v0.1.5 ICT third-party register evidence
+## v0.1.0 foundation release
 
-The executable boundary retains the inventory/dependency, ICT-risk, incident-evidence and resilience-testing contracts and adds deterministic ICT third-party arrangement governance:
+The v0.1.0 executable boundary provides an end-to-end, deterministic governance evidence chain:
 
-- contractual arrangements bound to an exact financial-entity inventory snapshot;
-- exact direct-provider, rank-1 direct-service, supported-function and subcontractor references;
-- subcontractor ancestry validation against the arrangement's direct-service roots;
-- explicit critical-or-important-function identifiers validated against the existing human-governed function classifications;
-- explicit provider-designation state, accountable owner and rationale rather than inference from provider names;
-- governed data-location and service-location evidence;
-- contract and control-requirement evidence digests;
-- explicit substitutability and concentration observations with immutable evidence binding;
-- institution-owned freshness and evidence requirements through a versioned third-party governance policy;
-- exit/transition-plan evidence with accountable owner, triggers, transition steps and optional alternate-provider reference;
-- deterministic policy-driven gaps for missing designation, locations, contract/control evidence, dependency observations, stale observations and required exit plans;
-- fail-closed conflicting-latest dependency observations and exit plans;
-- historical arrangement/observation/exit-plan evidence that cannot be silently overwritten;
-- deterministic register rows preserving supply-chain rank and parent-service relationships;
-- an internal `EU-2024-2956-support-v1` mapping profile intended to support register-of-information transformation work without claiming regulator-submission equivalence;
-- strict Draft 2020-12 JSON Schemas for arrangement, dependency observation, exit plan, governance policy and register snapshot artifacts;
-- Python 3.11/3.12/3.13 CI, wheel build and clean-wheel smoke testing.
+`inventory/dependencies → ICT risk/control state → incident evidence → resilience testing → third-party register/concentration/exit evidence → governance dossier`
 
-A complete register snapshot means the configured **institution-owned governance policy** has no represented gaps for that snapshot. It does not establish DORA compliance, contractual sufficiency, critical-provider designation, supervisory acceptance or regulator-ready filing status.
+Core controls include:
 
-## Existing governance foundation
+- financial-entity scoped inventory, dependency and ICT third-party supply-chain references;
+- explicit human critical/important-function classification;
+- exact inventory snapshot digests and fail-closed dangling/cross-scope references;
+- deterministic ICT inherent/residual risk decisions bound to scenario, policy and control evidence;
+- explicit treatment semantics and stale-risk revalidation;
+- append-only ICT incident timelines, impact observations and classification readiness;
+- human-reviewed incident classification rather than autonomous legal reportability decisions;
+- resilience test planning, execution, findings, remediation and independent retest evidence;
+- blocking high/critical findings and qualified-TLPT evidence boundaries;
+- contractual third-party arrangement, provider/service/function and subcontractor linkage;
+- explicit provider designation, substitutability and concentration observations;
+- institution-owned third-party gap/freshness policy and exit/transition-plan evidence;
+- strict Draft 2020-12 JSON Schemas across release artifacts;
+- deterministic v0.1 governance dossier with embedded canonical artifact payloads and SHA-256 digests;
+- offline dossier and embedded-artifact tamper detection;
+- Python 3.11/3.12/3.13 CI, wheel build and clean-wheel CLI smoke.
 
-DORAOps already provides financial-entity scoped inventory governance, explicit human critical/important-function classification, deterministic ICT-risk and treatment evidence, immutable incident timelines with human-reviewed classification readiness, and evidence-backed resilience-test planning/finding/remediation/retest resolution.
+## Governance dossier
+
+`GovernanceDossierBuilder` starts from the exact current inventory snapshot and packages canonical payloads for represented governance artifacts. During packaging it revalidates current-state bindings rather than trusting historical status labels.
+
+Dossier artifacts carry one of three states:
+
+- `current` — represented evidence is current for the checked relationships;
+- `with_gaps` — evidence is internally consistent but configured governance inputs or closure evidence are missing;
+- `revalidation_required` — a previously generated decision/result is stale or no longer matches current governed evidence.
+
+The dossier contains an `inventory_snapshot_manifest` whose canonical digest reproduces the exact `InventoryRegistry.snapshot_digest`. The outer dossier also carries its own SHA-256 digest. Offline verification recomputes the outer digest and every embedded artifact digest before accepting the document.
+
+A dossier state is an integrity/governance status for the represented evidence. It is not a compliance conclusion.
+
+## CLI
+
+The wheel installs the `doraops` command:
+
+```bash
+doraops --version
+doraops digest evidence.json
+doraops schema schema.json evidence.json
+doraops dossier verify governance-dossier.json
+```
+
+`digest` canonicalizes JSON before hashing. `schema` validates Draft 2020-12 schemas. `dossier verify` checks the dossier envelope, embedded artifact digests, aggregate state/findings consistency and inventory snapshot-manifest binding without network access.
 
 ## Regulatory design posture
 
@@ -44,23 +68,36 @@ Primary design inputs include:
 - Commission Delegated Regulation (EU) 2024/1774 on ICT risk-management tools, methods, processes and policies;
 - Commission Implementing Regulation (EU) 2024/2956 on standard templates for the register of information and ICT third-party supply-chain relationships.
 
-DORAOps maps governance evidence to these sources while separating technical validation from legal applicability, compliance conclusions, critical-provider designation and regulator-submission claims.
+DORAOps maps technical/governance evidence to these sources while deliberately separating machine validation from legal applicability, supervisory interpretation and institution-owned policy decisions.
 
-## v0.1 roadmap
+The internal `EU-2024-2956-support-v1` third-party mapping profile is intended to support transformation work. It is not represented as a regulator-submitted register or an authority-approved template implementation.
 
-`inventory/dependencies → ICT risk/control state → incident evidence → resilience testing → third-party register/concentration/exit evidence → deterministic governance dossier`
+## Explicit non-claims
 
-The remaining v0.1 milestone packages the complete governed state into a deterministic offline-verifiable dossier and CLI release gate.
+DORAOps v0.1.0 does **not** by itself establish:
+
+- DORA compliance or legal applicability;
+- supervisory or competent-authority acceptance;
+- successful regulatory filing or receipt;
+- operational resilience or production safety;
+- absence of vulnerabilities;
+- successful or regulator-recognized TLPT;
+- lawful/approved risk acceptance;
+- critical ICT third-party provider designation;
+- contractual sufficiency;
+- correct legal incident reportability or reporting deadlines.
+
+Those conclusions remain institution-, evidence-, regulator- and human-review dependent.
 
 ## Design principles
 
 - exact entity and governed-snapshot binding;
-- deterministic machine-readable evidence;
+- deterministic canonical JSON and SHA-256 evidence;
 - explicit human criticality, applicability, treatment, classification and provider-designation decisions;
 - fail-closed stale, incomplete, dangling and cross-scope references;
 - immutable historical evidence rather than silent overwrite;
 - qualified or regulatory claims require explicit evidence rather than inference from labels;
-- regulatory mappings separated from legal/certification/submission claims;
+- offline-verifiable release evidence where possible;
 - governance core does not perform autonomous regulatory submission.
 
 ## License

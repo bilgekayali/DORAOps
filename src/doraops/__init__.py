@@ -88,6 +88,17 @@ from .third_party_strict import (
     build_register_snapshot,
     build_third_party_arrangement,
 )
+from .dossier import (
+    DOSSIER_SCHEMA_VERSION,
+    RELEASE_VERSION,
+    DossierArtifactState,
+    DossierState,
+    GovernanceArtifact,
+    GovernanceDossier,
+    dossier_document,
+)
+from .dossier_strict import GovernanceDossierBuilder
+from .dossier_verify_strict import verify_dossier_document
 
 __all__ = [
     "canonical_json",
@@ -169,6 +180,15 @@ __all__ = [
     "ThirdPartyRegisterSnapshot",
     "build_register_snapshot",
     "build_third_party_arrangement",
+    "DOSSIER_SCHEMA_VERSION",
+    "RELEASE_VERSION",
+    "DossierArtifactState",
+    "DossierState",
+    "GovernanceArtifact",
+    "GovernanceDossier",
+    "GovernanceDossierBuilder",
+    "dossier_document",
+    "verify_dossier_document",
 ]
 
-__version__ = "0.1.0.dev5"
+__version__ = "0.1.0"
