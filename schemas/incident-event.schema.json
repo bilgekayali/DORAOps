@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/incident-event.schema.json",
+  "title": "DORAOps Incident Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "event_id", "sequence", "event_type", "occurred_at", "recorded_at", "actor_id", "summary", "evidence_digest", "related_reference"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "event_id": {"type": "string", "minLength": 1},
+    "sequence": {"type": "integer", "minimum": 1},
+    "event_type": {"enum": ["detected", "escalated", "contained", "recovered", "root_cause_identified", "remediation_linked", "notification_decision", "other"]},
+    "occurred_at": {"type": "integer", "minimum": 0},
+    "recorded_at": {"type": "integer", "minimum": 0},
+    "actor_id": {"type": "string", "minLength": 1},
+    "summary": {"type": "string", "minLength": 1},
+    "evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "related_reference": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]}
+  }
+}

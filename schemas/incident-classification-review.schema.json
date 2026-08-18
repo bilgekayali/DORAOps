@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/incident-classification-review.schema.json",
+  "title": "DORAOps Human Incident Classification Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "readiness_digest", "incident_evidence_snapshot_digest", "reviewer_id", "decision", "rationale", "reviewed_at"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "readiness_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "incident_evidence_snapshot_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "reviewer_id": {"type": "string", "minLength": 1},
+    "decision": {"enum": ["major", "non_major", "undetermined"]},
+    "rationale": {"type": "string", "minLength": 1},
+    "reviewed_at": {"type": "integer", "minimum": 0}
+  }
+}

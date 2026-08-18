@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/incident-impact.schema.json",
+  "title": "DORAOps Incident Impact Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "impact_id", "dimension", "severity", "observed_at", "affected_nodes", "summary", "evidence_digest"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "impact_id": {"type": "string", "minLength": 1},
+    "dimension": {"enum": ["service_availability", "data_confidentiality", "data_integrity", "data_availability", "client_impact", "financial_impact", "geographic_spread", "reputational_impact", "other"]},
+    "severity": {"type": "integer", "enum": [1, 2, 3, 4]},
+    "observed_at": {"type": "integer", "minimum": 0},
+    "affected_nodes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/nodeRef"}},
+    "summary": {"type": "string", "minLength": 1},
+    "evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "nodeRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "kind", "node_id"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["business_function", "business_process", "ict_service", "information_asset", "ict_asset", "third_party_service"]},
+        "node_id": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
