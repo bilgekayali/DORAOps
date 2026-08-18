@@ -4,26 +4,30 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "doraops"
-version = "0.1.0.dev5"
+version = "0.1.0"
 description = "Evidence-backed DORA operational resilience governance"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Bilge Kayali" }]
 classifiers = [
-  "Development Status :: 2 - Pre-Alpha",
+  "Development Status :: 3 - Alpha",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
 ]
-dependencies = []
+dependencies = [
+  "jsonschema>=4.23,<5",
+]
 
 [project.optional-dependencies]
 dev = [
-  "jsonschema>=4.23,<5",
   "pytest>=8,<9",
 ]
+
+[project.scripts]
+doraops = "doraops.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
