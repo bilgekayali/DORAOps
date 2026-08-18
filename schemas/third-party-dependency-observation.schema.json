@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/third-party-dependency-observation.schema.json",
+  "title": "DORAOps ICT Third-Party Dependency Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "arrangement_id", "arrangement_digest", "observation_id", "observed_at", "substitutability", "concentration", "rationale", "evidence_digest"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "arrangement_id": {"type": "string", "minLength": 1},
+    "arrangement_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "observation_id": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "integer", "minimum": 0},
+    "substitutability": {"enum": ["not_assessed", "easy", "moderate", "difficult"]},
+    "concentration": {"enum": ["not_assessed", "low", "medium", "high", "critical"]},
+    "rationale": {"type": "string", "minLength": 1},
+    "evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
