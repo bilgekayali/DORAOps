@@ -9,7 +9,8 @@ from typing import Any, Sequence
 import jsonschema
 
 from .canonical import sha256_digest
-from .dossier import RELEASE_VERSION, verify_dossier_document
+from .dossier import RELEASE_VERSION
+from .dossier_verify_strict import verify_dossier_document
 from .inventory import GovernanceError
 
 
