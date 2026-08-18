@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from .dossier import (
     DossierArtifactState,
     GovernanceDossier,
@@ -13,8 +15,41 @@ from .third_party_strict import (
 )
 
 
+def _inventory_node_id(node: Any) -> str:
+    for name in (
+        "function_id",
+        "process_id",
+        "service_id",
+        "asset_id",
+        "third_party_service_id",
+    ):
+        value = getattr(node, name, None)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    raise GovernanceError("inventory node does not expose a governed identity")
+
+
 class GovernanceDossierBuilder(_GovernanceDossierBuilder):
     """Public dossier builder preserving strict release-governance boundaries."""
+
+    def _add_inventory(self) -> None:
+        entity = self.inventory.entity(self.entity_id)
+        self._add("inventory", "financial_entity", entity.entity_id, entity)
+        for provider in self.inventory.providers(self.entity_id):
+            self._add("inventory", "third_party_provider", provider.provider_id, provider)
+        for node in self.inventory.nodes(self.entity_id):
+            self._add("inventory", type(node).__name__, _inventory_node_id(node), node)
+        for edge in self.inventory.edges(self.entity_id):
+            self._add("inventory", "dependency_edge", edge.edge_id, edge)
+        manifest = self.inventory.snapshot_manifest(self.entity_id)
+        artifact = self._add(
+            "inventory",
+            "inventory_snapshot_manifest",
+            self.entity_id,
+            manifest,
+        )
+        if artifact.digest != self.inventory_snapshot_digest:
+            raise GovernanceError("inventory snapshot manifest does not reproduce inventory digest")
 
     def add_third_party_register(
         self,
