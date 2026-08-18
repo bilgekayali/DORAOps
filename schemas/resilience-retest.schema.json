@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/resilience-retest.schema.json",
+  "title": "DORAOps Resilience Retest Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["finding_digest", "remediation_digest", "retest_id", "reviewer_id", "tested_at", "outcome", "notes", "evidence_digest"],
+  "properties": {
+    "finding_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "remediation_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "retest_id": {"type": "string", "minLength": 1},
+    "reviewer_id": {"type": "string", "minLength": 1},
+    "tested_at": {"type": "integer", "minimum": 0},
+    "outcome": {"enum": ["passed", "failed"]},
+    "notes": {"type": "string", "minLength": 1},
+    "evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

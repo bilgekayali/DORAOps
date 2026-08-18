@@ -36,6 +36,6 @@ jobs:
           /tmp/doraops-wheel/bin/python -m pip install dist/*.whl
           /tmp/doraops-wheel/bin/python - <<'PY'
           import doraops
-          assert doraops.__version__ == "0.1.0.dev3"
+          assert doraops.__version__ == "0.1.0.dev4"
           print(doraops.__version__)
           PY
