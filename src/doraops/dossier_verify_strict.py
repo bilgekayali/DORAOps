@@ -21,6 +21,135 @@ def _digest_list(name: str, value: Any) -> list[str]:
     return value
 
 
+def _require_digest_ref(name: str, value: Any, index: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    if not isinstance(value, str) or value not in index:
+        raise GovernanceError(f"continuity {name} does not resolve to an embedded artifact")
+    return index[value]
+
+
+def _verify_continuity(
+    artifacts: list[dict[str, Any]],
+    *,
+    entity_id: str,
+    inventory_snapshot_digest: str,
+) -> None:
+    continuity = [item for item in artifacts if item["domain"] == "continuity"]
+    if not continuity:
+        return
+    by_digest = {item["digest"]: item for item in continuity}
+    by_type: dict[str, list[dict[str, Any]]] = {}
+    for item in continuity:
+        by_type.setdefault(item["artifact_type"], []).append(item)
+
+    for item in by_type.get("recovery_objective", []):
+        payload = item["payload"]
+        if payload.get("entity_id") != entity_id:
+            raise GovernanceError("continuity recovery objective is outside dossier entity scope")
+        if payload.get("inventory_snapshot_digest") != inventory_snapshot_digest:
+            raise GovernanceError("continuity recovery objective is stale for dossier inventory snapshot")
+        target = payload.get("target")
+        if not isinstance(target, dict) or target.get("entity_id") != entity_id:
+            raise GovernanceError("continuity recovery objective target is outside dossier entity scope")
+
+    for item in by_type.get("exercise_plan", []):
+        payload = item["payload"]
+        if payload.get("entity_id") != entity_id:
+            raise GovernanceError("continuity exercise plan is outside dossier entity scope")
+        if payload.get("inventory_snapshot_digest") != inventory_snapshot_digest:
+            raise GovernanceError("continuity exercise plan is stale for dossier inventory snapshot")
+        objective = _require_digest_ref("exercise objective_digest", payload.get("objective_digest"), by_digest)
+        if objective["artifact_type"] != "recovery_objective":
+            raise GovernanceError("continuity exercise objective_digest resolves to wrong artifact type")
+        if payload.get("objective_target") != objective["payload"].get("target"):
+            raise GovernanceError("continuity exercise objective target does not match recovery objective")
+
+    for item in by_type.get("exercise_execution", []):
+        payload = item["payload"]
+        plan = _require_digest_ref("execution plan_digest", payload.get("plan_digest"), by_digest)
+        if plan["artifact_type"] != "exercise_plan":
+            raise GovernanceError("continuity execution plan_digest resolves to wrong artifact type")
+
+    for item in by_type.get("recovery_observation", []):
+        payload = item["payload"]
+        plan = _require_digest_ref("observation plan_digest", payload.get("plan_digest"), by_digest)
+        execution = _require_digest_ref("observation execution_digest", payload.get("execution_digest"), by_digest)
+        if plan["artifact_type"] != "exercise_plan" or execution["artifact_type"] != "exercise_execution":
+            raise GovernanceError("continuity recovery observation resolves to wrong plan/execution type")
+        if execution["payload"].get("plan_digest") != plan["digest"]:
+            raise GovernanceError("continuity recovery observation plan/execution bindings disagree")
+
+    for item in by_type.get("recovery_assessment", []):
+        payload = item["payload"]
+        if payload.get("entity_id") != entity_id:
+            raise GovernanceError("continuity recovery assessment is outside dossier entity scope")
+        plan = _require_digest_ref("assessment plan_digest", payload.get("plan_digest"), by_digest)
+        execution = _require_digest_ref("assessment execution_digest", payload.get("execution_digest"), by_digest)
+        objective = _require_digest_ref("assessment objective_digest", payload.get("objective_digest"), by_digest)
+        if plan["artifact_type"] != "exercise_plan" or execution["artifact_type"] != "exercise_execution":
+            raise GovernanceError("continuity assessment resolves to wrong plan/execution type")
+        if objective["artifact_type"] != "recovery_objective":
+            raise GovernanceError("continuity assessment resolves to wrong recovery objective type")
+        observation_digest = payload.get("observation_digest")
+        if observation_digest is not None:
+            observation = _require_digest_ref("assessment observation_digest", observation_digest, by_digest)
+            if observation["artifact_type"] != "recovery_observation":
+                raise GovernanceError("continuity assessment observation_digest resolves to wrong artifact type")
+            if observation["payload"].get("plan_digest") != plan["digest"]:
+                raise GovernanceError("continuity assessment observation belongs to different plan")
+            if observation["payload"].get("execution_digest") != execution["digest"]:
+                raise GovernanceError("continuity assessment observation belongs to different execution")
+        if payload.get("operational_resilience_determined") is not False:
+            raise GovernanceError("continuity assessment cannot determine operational resilience")
+        if payload.get("regulatory_compliance_determined") is not False:
+            raise GovernanceError("continuity assessment cannot determine regulatory compliance")
+
+    for item in by_type.get("dependency_impact_snapshot", []):
+        payload = item["payload"]
+        if payload.get("entity_id") != entity_id:
+            raise GovernanceError("dependency impact snapshot is outside dossier entity scope")
+        if payload.get("inventory_snapshot_digest") != inventory_snapshot_digest:
+            raise GovernanceError("dependency impact snapshot is stale for dossier inventory snapshot")
+        if payload.get("runtime_impact_determined") is not False:
+            raise GovernanceError("dependency topology evidence cannot determine runtime impact")
+
+    for item in by_type.get("finding", []):
+        payload = item["payload"]
+        if payload.get("entity_id") != entity_id:
+            raise GovernanceError("continuity finding is outside dossier entity scope")
+        assessment = _require_digest_ref("finding assessment_digest", payload.get("assessment_digest"), by_digest)
+        if assessment["artifact_type"] != "recovery_assessment":
+            raise GovernanceError("continuity finding assessment_digest resolves to wrong artifact type")
+
+    for item in by_type.get("remediation", []):
+        payload = item["payload"]
+        finding = _require_digest_ref("remediation finding_digest", payload.get("finding_digest"), by_digest)
+        if finding["artifact_type"] != "finding":
+            raise GovernanceError("continuity remediation finding_digest resolves to wrong artifact type")
+
+    for item in by_type.get("retest", []):
+        payload = item["payload"]
+        finding = _require_digest_ref("retest finding_digest", payload.get("finding_digest"), by_digest)
+        remediation = _require_digest_ref("retest remediation_digest", payload.get("remediation_digest"), by_digest)
+        if finding["artifact_type"] != "finding" or remediation["artifact_type"] != "remediation":
+            raise GovernanceError("continuity retest resolves to wrong lifecycle artifact type")
+        if remediation["payload"].get("finding_digest") != finding["digest"]:
+            raise GovernanceError("continuity retest finding/remediation bindings disagree")
+
+    for item in by_type.get("continuity_resolution", []):
+        payload = item["payload"]
+        plan = _require_digest_ref("resolution plan_digest", payload.get("plan_digest"), by_digest)
+        assessment = _require_digest_ref("resolution assessment_digest", payload.get("assessment_digest"), by_digest)
+        if plan["artifact_type"] != "exercise_plan" or assessment["artifact_type"] != "recovery_assessment":
+            raise GovernanceError("continuity resolution resolves to wrong plan/assessment artifact type")
+        unresolved = payload.get("unresolved_finding_digests")
+        if not isinstance(unresolved, list):
+            raise GovernanceError("continuity resolution unresolved_finding_digests must be an array")
+        for finding_digest in unresolved:
+            finding = _require_digest_ref("resolution unresolved finding", finding_digest, by_digest)
+            if finding["artifact_type"] != "finding":
+                raise GovernanceError("continuity resolution unresolved digest is not a finding")
+
+
 def verify_dossier_document(document: Any) -> str:
     """Verify cryptographic and cross-artifact dossier semantics offline."""
     digest = _verify_dossier_document(document)
@@ -90,4 +219,10 @@ def verify_dossier_document(document: Any) -> str:
         payload = artifact["payload"]
         if payload.get("entity_id") != entity_id:
             raise GovernanceError("inventory artifact is outside dossier entity scope")
+
+    _verify_continuity(
+        artifacts,
+        entity_id=entity_id,
+        inventory_snapshot_digest=dossier.get("inventory_snapshot_digest"),
+    )
     return digest
