@@ -1,5 +1,9 @@
 """DORAOps operational resilience governance contracts."""
 
+from ._release import PACKAGE_VERSION, apply_release_version as _apply_release_version
+
+_apply_release_version()
+
 from .canonical import canonical_json, sha256_digest
 from .inventory import (
     BusinessFunction,
@@ -69,6 +73,39 @@ from .resilience import (
     create_retest,
     record_test_execution,
     resolve_test,
+)
+from .continuity import (
+    ContinuityAssessment,
+    ContinuityExerciseExecution,
+    ContinuityExercisePlan,
+    ContinuityFinding,
+    ContinuityFindingResolution,
+    ContinuityFindingStatus,
+    ContinuityRemediationEvidence,
+    ContinuityResolution,
+    ContinuityResolutionState,
+    ContinuityRetestEvidence,
+    DependencyImpactSnapshot,
+    DependencyTraversalDirection,
+    RecoveryAssessmentState,
+    RecoveryMetric,
+    RecoveryMetricAssessment,
+    RecoveryMetricState,
+    RecoveryObjectiveProfile,
+    RecoveryObservation,
+    assert_continuity_plan_current,
+    assert_dependency_impact_current,
+    assert_recovery_objective_current,
+    assess_continuity_recovery,
+    build_continuity_exercise_plan,
+    build_dependency_impact_snapshot,
+    build_recovery_objective,
+    create_continuity_finding,
+    create_continuity_remediation,
+    create_continuity_retest,
+    record_continuity_execution,
+    record_recovery_observation,
+    resolve_continuity,
 )
 from .third_party_strict import (
     ConcentrationAssessment,
@@ -164,6 +201,37 @@ __all__ = [
     "create_retest",
     "record_test_execution",
     "resolve_test",
+    "RecoveryMetric",
+    "RecoveryMetricState",
+    "RecoveryAssessmentState",
+    "ContinuityFindingStatus",
+    "ContinuityResolutionState",
+    "DependencyTraversalDirection",
+    "RecoveryObjectiveProfile",
+    "ContinuityExercisePlan",
+    "ContinuityExerciseExecution",
+    "RecoveryObservation",
+    "RecoveryMetricAssessment",
+    "ContinuityAssessment",
+    "ContinuityFinding",
+    "ContinuityRemediationEvidence",
+    "ContinuityRetestEvidence",
+    "ContinuityFindingResolution",
+    "ContinuityResolution",
+    "DependencyImpactSnapshot",
+    "build_recovery_objective",
+    "assert_recovery_objective_current",
+    "build_continuity_exercise_plan",
+    "assert_continuity_plan_current",
+    "record_continuity_execution",
+    "record_recovery_observation",
+    "assess_continuity_recovery",
+    "create_continuity_finding",
+    "create_continuity_remediation",
+    "create_continuity_retest",
+    "resolve_continuity",
+    "build_dependency_impact_snapshot",
+    "assert_dependency_impact_current",
     "ConcentrationAssessment",
     "DependencyObservation",
     "ExitTransitionPlan",
@@ -191,4 +259,6 @@ __all__ = [
     "verify_dossier_document",
 ]
 
-__version__ = "0.1.0"
+__version__ = PACKAGE_VERSION
+
+del _apply_release_version
