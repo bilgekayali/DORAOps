@@ -19,8 +19,8 @@ from .continuity import (
     assert_dependency_impact_current,
     assert_recovery_objective_current,
     assess_continuity_recovery,
-    resolve_continuity,
 )
+from .continuity_strict import resolve_continuity
 from .dossier import (
     DossierArtifactState,
     GovernanceDossier,
