@@ -8,40 +8,38 @@ DORAOps is an open-source reference architecture for structuring and evidencing 
 
 The project is not a legal-compliance engine, supervisory reporting service, regulator filing gateway, or certification product.
 
-## Current implementation — v0.1.2 inventory and ICT risk foundation
+## Current implementation — v0.1.3 ICT incident evidence foundation
 
-The current executable boundary provides:
+The current executable boundary retains the v0.1.1 inventory/dependency and v0.1.2 ICT-risk contracts and adds deterministic incident evidence governance:
 
-- financial-entity scoped inventory governance;
-- explicit human classification of business functions as standard or critical/important;
-- business-process and ICT-service inventory;
-- information-asset and ICT-asset inventory;
-- ICT third-party provider and service references;
-- direct-provider supply-chain rank 1 and subcontractor rank >1 semantics;
-- required parent relationships for subcontracted ICT services;
-- exact function/process/service/asset/third-party dependency edges;
-- fail-closed dangling and cross-entity dependency validation;
-- conflicting identity/overwrite protection;
-- deterministic canonical JSON and inventory snapshot SHA-256 digests;
-- ICT risk scenarios bound to exact affected inventory nodes and accountable risk owners;
-- deterministic inherent ICT risk derived from explicit likelihood and impact observations;
-- evidence-backed ICT control observations with bounded residual-risk credit;
-- entity-scoped, versioned ICT risk policy profiles and deterministic residual-risk decisions;
-- explicit mitigate, accept, avoid and transfer treatment semantics;
-- mandatory target timestamps for mitigation treatment;
-- explicit high/critical residual-risk acceptance and remediation-required state;
-- exact inventory-snapshot, scenario, policy and control-evidence digest binding;
-- fail-closed stale-risk detection after inventory, scenario, policy or control evidence changes;
-- strict Draft 2020-12 JSON Schemas for inventory, dependency and ICT-risk artifacts;
+- immutable ICT incident identity bound to an exact inventory snapshot;
+- affected business-function, process, ICT-service, information/ICT-asset and third-party-service references validated against the governed inventory;
+- provider impact derivable through exact affected third-party-service relationships rather than mutable provider names;
+- occurred/detected incident timestamps and accountable incident owner;
+- append-only, contiguous incident event timelines with immutable event identities;
+- detected, escalated, contained, recovered, root-cause, remediation-link and notification-decision event types;
+- explicit evidence digests for every timeline event and impact observation;
+- structured impact observations across availability, confidentiality, integrity, client, financial, geographic and reputational dimensions;
+- institution-configurable classification-readiness policy defining required impact dimensions and evidence classes;
+- deterministic missing-input exposure instead of defaulting incomplete incidents to a final classification;
+- exact incident evidence-snapshot and policy digest binding;
+- fail-closed stale-readiness detection if incident evidence changes before review;
+- final classification represented only as an explicit human-reviewed decision (`major`, `non_major` or `undetermined`);
+- no fabricated regulator submission timestamps, acknowledgements or authority acceptance evidence;
+- strict Draft 2020-12 JSON Schemas for incident, event, impact, readiness and human-review artifacts;
 - Python 3.11/3.12/3.13 CI, wheel build and clean-wheel smoke testing.
 
-Critical/important-function status and risk treatment remain accountable governance decisions. Inventory or risk evidence does not itself establish resilience, DORA compliance, supervisory acceptance or lawful risk acceptance.
+The incident layer provides classification **readiness evidence**, not an autonomous legal determination that an incident is major or reportable. A human reviewer remains accountable for the recorded classification decision, and institution-specific reporting/legal workflows remain outside this milestone.
+
+## Existing inventory and ICT-risk foundation
+
+DORAOps already provides financial-entity scoped inventory governance, explicit human critical/important-function classification, business-process/ICT-service/information-asset/ICT-asset inventories, ICT third-party provider/service supply-chain semantics, deterministic dependency edges, exact inventory snapshot digests, ICT risk scenarios, evidence-backed control observations, configurable inherent/residual risk decisions, treatment semantics and fail-closed stale-risk detection.
 
 ## Regulatory design posture
 
 Primary design inputs include:
 
-- Regulation (EU) 2022/2554 (DORA), including Article 8 identification/classification, dependency inventory and ICT risk-management requirements;
+- Regulation (EU) 2022/2554 (DORA), including Article 8 identification/classification, ICT incident management/reporting governance, dependency inventory and ICT risk-management requirements;
 - Commission Delegated Regulation (EU) 2024/1774 on ICT risk-management tools, methods, processes and policies;
 - Commission Implementing Regulation (EU) 2024/2956 on standard templates for the register of information and ICT third-party supply-chain relationships.
 
@@ -51,15 +49,15 @@ DORAOps maps governance evidence to these sources while separating technical val
 
 `inventory/dependencies → ICT risk/control state → incident evidence → resilience testing → third-party register/concentration/exit evidence → deterministic governance dossier`
 
-The next milestone is the ICT incident evidence timeline and classification-readiness layer. Later v0.1 milestones add resilience testing, third-party register/concentration/exit evidence and the final deterministic dossier/CLI release gate.
+The next milestone is resilience testing plans, findings and remediation evidence. Later v0.1 milestones add third-party register/concentration/exit evidence and the final deterministic dossier/CLI release gate.
 
 ## Design principles
 
 - exact entity and governed-snapshot binding;
 - deterministic machine-readable evidence;
-- explicit human criticality, applicability and treatment decisions;
-- fail-closed stale, dangling and cross-scope references;
-- historical evidence rather than silent overwrite;
+- explicit human criticality, applicability, treatment and incident-classification decisions;
+- fail-closed stale, incomplete, dangling and cross-scope references;
+- append-only historical incident evidence rather than silent overwrite;
 - regulatory mappings separated from legal/certification claims;
 - governance core does not perform autonomous regulatory submission.
 

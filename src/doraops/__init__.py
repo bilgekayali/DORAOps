@@ -32,6 +32,22 @@ from .risk import (
     assess_ict_risk,
     assert_risk_decision_current,
 )
+from .incidents import (
+    ClassificationReadinessState,
+    HumanClassificationDecision,
+    ICTIncident,
+    ImpactDimension,
+    ImpactSeverity,
+    IncidentClassificationPolicy,
+    IncidentClassificationReadiness,
+    IncidentClassificationReview,
+    IncidentEvent,
+    IncidentEventType,
+    IncidentImpactObservation,
+    IncidentRegistry,
+    assess_classification_readiness,
+    review_incident_classification,
+)
 
 __all__ = [
     "canonical_json",
@@ -63,6 +79,20 @@ __all__ = [
     "TreatmentType",
     "assess_ict_risk",
     "assert_risk_decision_current",
+    "ClassificationReadinessState",
+    "HumanClassificationDecision",
+    "ICTIncident",
+    "ImpactDimension",
+    "ImpactSeverity",
+    "IncidentClassificationPolicy",
+    "IncidentClassificationReadiness",
+    "IncidentClassificationReview",
+    "IncidentEvent",
+    "IncidentEventType",
+    "IncidentImpactObservation",
+    "IncidentRegistry",
+    "assess_classification_readiness",
+    "review_incident_classification",
 ]
 
-__version__ = "0.1.0.dev2"
+__version__ = "0.1.0.dev3"

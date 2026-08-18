@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/incident-classification-readiness.schema.json",
+  "title": "DORAOps Incident Classification Readiness",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "incident_digest", "incident_evidence_snapshot_digest", "policy_digest", "state", "missing_inputs", "observed_impact_dimensions"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "incident_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "incident_evidence_snapshot_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "policy_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "state": {"enum": ["incomplete", "ready_for_human_review"]},
+    "missing_inputs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "observed_impact_dimensions": {"type": "array", "uniqueItems": true, "items": {"enum": ["service_availability", "data_confidentiality", "data_integrity", "data_availability", "client_impact", "financial_impact", "geographic_spread", "reputational_impact", "other"]}}
+  }
+}
