@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/governance-dossier.schema.json",
+  "title": "DORAOps v0.1.0 Governance Dossier Document",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dossier", "dossier_digest"],
+  "properties": {
+    "dossier_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "dossier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "release_version",
+        "entity_id",
+        "generated_at",
+        "source_revision",
+        "inventory_snapshot_digest",
+        "artifacts",
+        "coverage",
+        "state",
+        "findings"
+      ],
+      "properties": {
+        "schema_version": {"const": "doraops-governance-dossier.v1"},
+        "release_version": {"const": "0.1.0"},
+        "entity_id": {"type": "string", "minLength": 1},
+        "generated_at": {"type": "integer", "minimum": 0},
+        "source_revision": {"type": "string", "minLength": 1},
+        "inventory_snapshot_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "artifacts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/artifact"}
+        },
+        "coverage": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"type": "integer", "minimum": 0}
+        },
+        "state": {"enum": ["current", "with_gaps", "revalidation_required"]},
+        "findings": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain", "artifact_type", "artifact_id", "payload", "digest", "state", "findings"],
+      "properties": {
+        "domain": {"type": "string", "minLength": 1},
+        "artifact_type": {"type": "string", "minLength": 1},
+        "artifact_id": {"type": "string", "minLength": 1},
+        "payload": {"type": "object"},
+        "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "state": {"enum": ["current", "with_gaps", "revalidation_required"]},
+        "findings": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}
