@@ -328,34 +328,57 @@ class InventoryRegistry:
         self._edges.setdefault(key, edge)
         return edge.evidence_digest
 
+    def entity(self, entity_id: str) -> FinancialEntity:
+        """Return the governed financial-entity record without exposing mutable storage."""
+        return self._require_entity(entity_id)
+
+    def providers(self, entity_id: str) -> tuple[ThirdPartyProvider, ...]:
+        self._require_entity(entity_id)
+        return tuple(
+            sorted(
+                (item for (scope, _), item in self._providers.items() if scope == entity_id),
+                key=lambda item: item.provider_id,
+            )
+        )
+
+    def nodes(self, entity_id: str) -> tuple[Any, ...]:
+        self._require_entity(entity_id)
+        return tuple(
+            item
+            for _, item in sorted(
+                (
+                    ((kind.value, node_id), item)
+                    for (scope, kind, node_id), item in self._nodes.items()
+                    if scope == entity_id
+                ),
+                key=lambda pair: pair[0],
+            )
+        )
+
+    def edges(self, entity_id: str) -> tuple[DependencyEdge, ...]:
+        self._require_entity(entity_id)
+        return tuple(
+            sorted(
+                (item for (scope, _), item in self._edges.items() if scope == entity_id),
+                key=lambda item: item.edge_id,
+            )
+        )
+
     def node(self, ref: NodeRef) -> Any:
         return self._require_node(ref)
 
+    def snapshot_manifest(self, entity_id: str) -> dict[str, Any]:
+        """Return the exact digest manifest used by ``snapshot_digest``."""
+        entity = self._require_entity(entity_id)
+        return {
+            "entity": entity.evidence_digest,
+            "nodes": sorted(sha256_digest(node) for node in self.nodes(entity_id)),
+            "providers": sorted(provider.evidence_digest for provider in self.providers(entity_id)),
+            "edges": sorted(edge.evidence_digest for edge in self.edges(entity_id)),
+        }
+
     def snapshot_digest(self, entity_id: str) -> str:
-        self._require_entity(entity_id)
-        nodes = sorted(
-            sha256_digest(node)
-            for (scope, _, _), node in self._nodes.items()
-            if scope == entity_id
-        )
-        providers = sorted(
-            provider.evidence_digest
-            for (scope, _), provider in self._providers.items()
-            if scope == entity_id
-        )
-        edges = sorted(
-            edge.evidence_digest
-            for (scope, _), edge in self._edges.items()
-            if scope == entity_id
-        )
-        return sha256_digest(
-            {
-                "entity": self._entities[entity_id].evidence_digest,
-                "nodes": nodes,
-                "providers": providers,
-                "edges": edges,
-            }
-        )
+        return sha256_digest(self.snapshot_manifest(entity_id))
 
     def _require_entity(self, entity_id: str) -> FinancialEntity:
         try:
