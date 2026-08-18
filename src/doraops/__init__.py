@@ -48,6 +48,28 @@ from .incidents import (
     assess_classification_readiness,
     review_incident_classification,
 )
+from .resilience import (
+    FindingResolution,
+    FindingSeverity,
+    FindingStatus,
+    RemediationEvidence,
+    ResilienceFinding,
+    ResilienceTestExecution,
+    ResilienceTestPlan,
+    ResilienceTestResolution,
+    ResilienceTestType,
+    RetestEvidence,
+    RetestOutcome,
+    TestExecutionOutcome,
+    TestResolutionState,
+    assert_test_plan_current,
+    build_resilience_test_plan,
+    create_finding,
+    create_remediation,
+    create_retest,
+    record_test_execution,
+    resolve_test,
+)
 
 __all__ = [
     "canonical_json",
@@ -93,6 +115,26 @@ __all__ = [
     "IncidentRegistry",
     "assess_classification_readiness",
     "review_incident_classification",
+    "FindingResolution",
+    "FindingSeverity",
+    "FindingStatus",
+    "RemediationEvidence",
+    "ResilienceFinding",
+    "ResilienceTestExecution",
+    "ResilienceTestPlan",
+    "ResilienceTestResolution",
+    "ResilienceTestType",
+    "RetestEvidence",
+    "RetestOutcome",
+    "TestExecutionOutcome",
+    "TestResolutionState",
+    "assert_test_plan_current",
+    "build_resilience_test_plan",
+    "create_finding",
+    "create_remediation",
+    "create_retest",
+    "record_test_execution",
+    "resolve_test",
 ]
 
-__version__ = "0.1.0.dev3"
+__version__ = "0.1.0.dev4"

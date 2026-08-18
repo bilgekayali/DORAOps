@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/resilience-finding.schema.json",
+  "title": "DORAOps Resilience Finding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["plan_digest", "execution_digest", "finding_id", "severity", "title", "owner_id", "identified_at", "evidence_digest"],
+  "properties": {
+    "plan_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "execution_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "finding_id": {"type": "string", "minLength": 1},
+    "severity": {"enum": ["low", "medium", "high", "critical"]},
+    "title": {"type": "string", "minLength": 1},
+    "owner_id": {"type": "string", "minLength": 1},
+    "identified_at": {"type": "integer", "minimum": 0},
+    "evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

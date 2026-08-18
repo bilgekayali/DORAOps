@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/resilience-test-resolution.schema.json",
+  "title": "DORAOps Resilience Test Resolution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["plan_digest", "execution_digest", "state", "finding_resolutions", "unresolved_finding_digests", "evidence_history_digests"],
+  "properties": {
+    "plan_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "execution_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "state": {"enum": ["successful", "successful_with_findings", "blocked", "incomplete"]},
+    "finding_resolutions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["finding_digest", "status", "blocking", "remediation_digest", "retest_digest"],
+        "properties": {
+          "finding_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "status": {"enum": ["open", "remediation_submitted", "retest_failed", "closed"]},
+          "blocking": {"type": "boolean"},
+          "remediation_digest": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9a-f]{64}$"}]},
+          "retest_digest": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9a-f]{64}$"}]}
+        }
+      }
+    },
+    "unresolved_finding_digests": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "evidence_history_digests": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+  }
+}
