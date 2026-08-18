@@ -26,6 +26,16 @@ jobs:
         run: python -m pip install -e '.[dev]'
       - name: Run tests
         run: python -m pytest
+      - name: Validate all Draft 2020-12 schemas
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import jsonschema
+          for path in sorted(Path("schemas").glob("*.schema.json")):
+              jsonschema.Draft202012Validator.check_schema(json.loads(path.read_text(encoding="utf-8")))
+              print(path)
+          PY
       - name: Build wheel
         run: python -m build --wheel
       - name: Clean-wheel smoke
@@ -36,7 +46,12 @@ jobs:
           /tmp/doraops-wheel/bin/python -m pip install dist/*.whl
           /tmp/doraops-wheel/bin/python - <<'PY'
           import doraops
-          assert doraops.__version__ == "0.1.0"
+          from doraops import RecoveryObjectiveProfile, GovernanceDossierBuilder, DependencyImpactSnapshot
+          assert doraops.__version__ == "0.2.0"
+          assert doraops.RELEASE_VERSION == "0.2.0"
+          assert RecoveryObjectiveProfile is not None
+          assert GovernanceDossierBuilder is not None
+          assert DependencyImpactSnapshot is not None
           print(doraops.__version__)
           PY
           /tmp/doraops-wheel/bin/doraops --version
