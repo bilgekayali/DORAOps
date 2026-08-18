@@ -105,8 +105,8 @@ from .continuity import (
     create_continuity_retest,
     record_continuity_execution,
     record_recovery_observation,
-    resolve_continuity,
 )
+from .continuity_strict import resolve_continuity
 from .third_party_strict import (
     ConcentrationAssessment,
     DependencyObservation,
