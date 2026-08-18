@@ -70,7 +70,7 @@ from .resilience import (
     record_test_execution,
     resolve_test,
 )
-from .third_party import (
+from .third_party_strict import (
     ConcentrationAssessment,
     DependencyObservation,
     ExitTransitionPlan,
