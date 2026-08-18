@@ -95,10 +95,10 @@ from .dossier import (
     DossierState,
     GovernanceArtifact,
     GovernanceDossier,
-    GovernanceDossierBuilder,
     dossier_document,
     verify_dossier_document,
 )
+from .dossier_strict import GovernanceDossierBuilder
 
 __all__ = [
     "canonical_json",
