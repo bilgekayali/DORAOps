@@ -96,9 +96,9 @@ from .dossier import (
     GovernanceArtifact,
     GovernanceDossier,
     dossier_document,
-    verify_dossier_document,
 )
 from .dossier_strict import GovernanceDossierBuilder
+from .dossier_verify_strict import verify_dossier_document
 
 __all__ = [
     "canonical_json",
