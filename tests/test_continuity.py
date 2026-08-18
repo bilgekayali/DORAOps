@@ -29,7 +29,6 @@ from doraops import (
     record_continuity_execution,
     record_recovery_observation,
     resolve_continuity,
-    sha256_digest,
 )
 from tests.test_inventory import build_registry
 
@@ -204,6 +203,52 @@ def test_recovery_assessment_met_breached_incomplete_and_conflicting_latest() ->
         )
 
 
+def test_recovery_objective_rejects_incoherent_or_non_service_targets_and_bool_numbers() -> None:
+    registry, function, *_ = continuity_registry()
+    with pytest.raises(GovernanceError, match="cannot exceed maximum tolerable disruption"):
+        build_recovery_objective(
+            registry,
+            entity_id="bank-a",
+            objective_id="bad-rto",
+            target=function,
+            owner_id="owner",
+            maximum_tolerable_disruption_seconds=300,
+            recovery_time_objective_seconds=600,
+            recovery_point_objective_seconds=60,
+            minimum_service_level_basis_points=8000,
+            rationale="invalid objective ordering",
+            registered_at=1,
+        )
+    with pytest.raises(GovernanceError, match="business function, process or ICT service"):
+        build_recovery_objective(
+            registry,
+            entity_id="bank-a",
+            objective_id="bad-target",
+            target=NodeRef("bank-a", NodeKind.INFORMATION_ASSET, "payment-ledger-data"),
+            owner_id="owner",
+            maximum_tolerable_disruption_seconds=600,
+            recovery_time_objective_seconds=300,
+            recovery_point_objective_seconds=60,
+            minimum_service_level_basis_points=8000,
+            rationale="invalid recovery target",
+            registered_at=1,
+        )
+    with pytest.raises(GovernanceError, match="positive integer"):
+        build_recovery_objective(
+            registry,
+            entity_id="bank-a",
+            objective_id="bad-bool",
+            target=function,
+            owner_id="owner",
+            maximum_tolerable_disruption_seconds=True,
+            recovery_time_objective_seconds=1,
+            recovery_point_objective_seconds=0,
+            minimum_service_level_basis_points=8000,
+            rationale="bool must not pass as integer",
+            registered_at=1,
+        )
+
+
 def test_objective_and_plan_fail_closed_after_topology_change() -> None:
     registry, *_, objective, plan, _ = continuity_fixture()
     registry.register_node(
@@ -231,7 +276,8 @@ def test_dependency_impact_snapshot_walks_modeled_topology_and_becomes_stale() -
         maximum_depth=3,
         generated_at=250,
     )
-    assert snapshot.impacted_nodes == (process, service, asset)
+    expected = tuple(sorted((process, service, asset), key=lambda ref: (ref.kind.value, ref.node_id)))
+    assert snapshot.impacted_nodes == expected
     assert snapshot.runtime_impact_determined is False
     assert_dependency_impact_current(snapshot, registry)
 
