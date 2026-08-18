@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from .dossier import DossierArtifactState, GovernanceDossierBuilder as _GovernanceDossierBuilder
+from .dossier import (
+    DossierArtifactState,
+    GovernanceDossier,
+    GovernanceDossierBuilder as _GovernanceDossierBuilder,
+)
 from .inventory import GovernanceError
 from .third_party_strict import (
     ThirdPartyGovernancePolicy,
@@ -10,7 +14,7 @@ from .third_party_strict import (
 
 
 class GovernanceDossierBuilder(_GovernanceDossierBuilder):
-    """Public dossier builder preserving the strict third-party governance boundary."""
+    """Public dossier builder preserving strict release-governance boundaries."""
 
     def add_third_party_register(
         self,
@@ -54,3 +58,8 @@ class GovernanceDossierBuilder(_GovernanceDossierBuilder):
             state=state,
             findings=findings,
         )
+
+    def build(self) -> GovernanceDossier:
+        if self.inventory.snapshot_digest(self.entity_id) != self.inventory_snapshot_digest:
+            raise GovernanceError("inventory changed during dossier construction; rebuild required")
+        return super().build()
