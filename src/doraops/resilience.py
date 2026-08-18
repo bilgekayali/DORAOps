@@ -360,6 +360,9 @@ def record_test_execution(
     notes: str,
 ) -> ResilienceTestExecution:
     assert_test_plan_current(plan, registry, risk_decisions)
+    executed_at = _timestamp("executed_at", executed_at)
+    if executed_at < plan.planned_at:
+        raise GovernanceError("test execution cannot precede the planned test timestamp")
     return ResilienceTestExecution(
         plan_digest=plan.evidence_digest,
         execution_id=execution_id,
@@ -384,6 +387,9 @@ def create_finding(
 ) -> ResilienceFinding:
     if execution.plan_digest != plan.evidence_digest:
         raise GovernanceError("test execution is bound to a different plan")
+    identified_at = _timestamp("identified_at", identified_at)
+    if identified_at < execution.executed_at:
+        raise GovernanceError("finding cannot precede the bound test execution")
     return ResilienceFinding(
         plan_digest=plan.evidence_digest,
         execution_digest=execution.evidence_digest,
@@ -473,6 +479,8 @@ def resolve_test(
         raise GovernanceError("test execution is bound to a different plan")
 
     finding_list = tuple(sorted(findings, key=lambda item: item.finding_id))
+    if execution.outcome is TestExecutionOutcome.PASSED_WITH_FINDINGS and not finding_list:
+        raise GovernanceError("passed_with_findings execution requires finding evidence")
     finding_ids = tuple(item.finding_id for item in finding_list)
     if len(finding_ids) != len(set(finding_ids)):
         raise GovernanceError("resilience findings must have unique finding_id values")
@@ -557,7 +565,7 @@ def resolve_test(
         state = TestResolutionState.INCOMPLETE
     elif execution.outcome is TestExecutionOutcome.FAILED or blocking_unresolved:
         state = TestResolutionState.BLOCKED
-    elif findings:
+    elif finding_list:
         state = TestResolutionState.SUCCESSFUL_WITH_FINDINGS
     else:
         state = TestResolutionState.SUCCESSFUL
