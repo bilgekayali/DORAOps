@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/third-party-exit-plan.schema.json",
+  "title": "DORAOps ICT Third-Party Exit Transition Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "arrangement_id", "arrangement_digest", "exit_plan_id", "owner_id", "updated_at", "trigger_conditions", "transition_steps", "evidence_digests", "alternate_provider_reference"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "arrangement_id": {"type": "string", "minLength": 1},
+    "arrangement_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "exit_plan_id": {"type": "string", "minLength": 1},
+    "owner_id": {"type": "string", "minLength": 1},
+    "updated_at": {"type": "integer", "minimum": 0},
+    "trigger_conditions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "transition_steps": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "evidence_digests": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "alternate_provider_reference": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]}
+  }
+}
