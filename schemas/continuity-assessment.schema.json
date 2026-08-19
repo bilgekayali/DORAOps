@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/continuity-assessment.schema.json",
+  "title": "DORAOps Continuity Recovery Assessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "entity_id", "plan_digest", "execution_digest", "objective_digest", "observation_digest",
+    "assessed_at", "state", "metric_assessments", "gaps",
+    "operational_resilience_determined", "regulatory_compliance_determined"
+  ],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "plan_digest": {"$ref": "#/$defs/digest"},
+    "execution_digest": {"$ref": "#/$defs/digest"},
+    "objective_digest": {"$ref": "#/$defs/digest"},
+    "observation_digest": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]},
+    "assessed_at": {"type": "integer", "minimum": 0},
+    "state": {"enum": ["met", "breached", "incomplete"]},
+    "metric_assessments": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {"$ref": "#/$defs/metricAssessment"}
+    },
+    "gaps": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "operational_resilience_determined": {"const": false},
+    "regulatory_compliance_determined": {"const": false}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "metricAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric", "state", "observed_value", "threshold_value", "reason"],
+      "properties": {
+        "metric": {"enum": ["maximum_tolerable_disruption", "recovery_time_objective", "recovery_point_objective", "minimum_service_level"]},
+        "state": {"enum": ["met", "breached", "incomplete"]},
+        "observed_value": {"type": ["integer", "null"], "minimum": 0},
+        "threshold_value": {"type": "integer", "minimum": 0},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

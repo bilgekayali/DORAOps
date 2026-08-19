@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/recovery-objective.schema.json",
+  "title": "DORAOps Recovery Objective Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "entity_id", "objective_id", "target", "inventory_snapshot_digest", "owner_id",
+    "maximum_tolerable_disruption_seconds", "recovery_time_objective_seconds",
+    "recovery_point_objective_seconds", "minimum_service_level_basis_points",
+    "rationale", "registered_at"
+  ],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "objective_id": {"type": "string", "minLength": 1},
+    "target": {"$ref": "#/$defs/recoveryTarget"},
+    "inventory_snapshot_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "owner_id": {"type": "string", "minLength": 1},
+    "maximum_tolerable_disruption_seconds": {"type": "integer", "minimum": 1},
+    "recovery_time_objective_seconds": {"type": "integer", "minimum": 1},
+    "recovery_point_objective_seconds": {"type": "integer", "minimum": 0},
+    "minimum_service_level_basis_points": {"type": "integer", "minimum": 1, "maximum": 10000},
+    "rationale": {"type": "string", "minLength": 1},
+    "registered_at": {"type": "integer", "minimum": 0}
+  },
+  "$defs": {
+    "recoveryTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "kind", "node_id"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["business_function", "business_process", "ict_service"]},
+        "node_id": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

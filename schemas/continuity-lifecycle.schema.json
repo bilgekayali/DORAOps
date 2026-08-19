@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/continuity-lifecycle.schema.json",
+  "title": "DORAOps Continuity Finding Lifecycle Evidence",
+  "oneOf": [
+    {"$ref": "#/$defs/finding"},
+    {"$ref": "#/$defs/remediation"},
+    {"$ref": "#/$defs/retest"},
+    {"$ref": "#/$defs/resolution"}
+  ],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "finding_id", "assessment_digest", "severity", "title", "owner_id", "identified_at", "evidence_digest"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "finding_id": {"type": "string", "minLength": 1},
+        "assessment_digest": {"$ref": "#/$defs/digest"},
+        "severity": {"enum": ["low", "medium", "high", "critical"]},
+        "title": {"type": "string", "minLength": 1},
+        "owner_id": {"type": "string", "minLength": 1},
+        "identified_at": {"type": "integer", "minimum": 0},
+        "evidence_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "remediation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding_digest", "remediation_id", "owner_id", "completed_at", "summary", "evidence_digest"],
+      "properties": {
+        "finding_digest": {"$ref": "#/$defs/digest"},
+        "remediation_id": {"type": "string", "minLength": 1},
+        "owner_id": {"type": "string", "minLength": 1},
+        "completed_at": {"type": "integer", "minimum": 0},
+        "summary": {"type": "string", "minLength": 1},
+        "evidence_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "retest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding_digest", "remediation_digest", "retest_id", "reviewer_id", "tested_at", "outcome", "notes", "evidence_digest"],
+      "properties": {
+        "finding_digest": {"$ref": "#/$defs/digest"},
+        "remediation_digest": {"$ref": "#/$defs/digest"},
+        "retest_id": {"type": "string", "minLength": 1},
+        "reviewer_id": {"type": "string", "minLength": 1},
+        "tested_at": {"type": "integer", "minimum": 0},
+        "outcome": {"enum": ["passed", "failed"]},
+        "notes": {"type": "string", "minLength": 1},
+        "evidence_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "findingResolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding_digest", "status", "blocking", "remediation_digest", "retest_digest"],
+      "properties": {
+        "finding_digest": {"$ref": "#/$defs/digest"},
+        "status": {"enum": ["open", "remediation_submitted", "retest_failed", "closed"]},
+        "blocking": {"type": "boolean"},
+        "remediation_digest": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]},
+        "retest_digest": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]}
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plan_digest", "assessment_digest", "state", "finding_resolutions", "unresolved_finding_digests", "evidence_history_digests"],
+      "properties": {
+        "plan_digest": {"$ref": "#/$defs/digest"},
+        "assessment_digest": {"$ref": "#/$defs/digest"},
+        "state": {"enum": ["successful", "successful_with_findings", "blocked", "incomplete"]},
+        "finding_resolutions": {"type": "array", "items": {"$ref": "#/$defs/findingResolution"}},
+        "unresolved_finding_digests": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/digest"}},
+        "evidence_history_digests": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/digest"}}
+      }
+    }
+  }
+}

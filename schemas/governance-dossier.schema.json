@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://doraops.dev/schemas/governance-dossier.schema.json",
-  "title": "DORAOps v0.1.0 Governance Dossier Document",
+  "title": "DORAOps v0.2.0 Governance Dossier Document",
   "type": "object",
   "additionalProperties": false,
   "required": ["dossier", "dossier_digest"],
@@ -24,7 +24,7 @@
       ],
       "properties": {
         "schema_version": {"const": "doraops-governance-dossier.v1"},
-        "release_version": {"const": "0.1.0"},
+        "release_version": {"const": "0.2.0"},
         "entity_id": {"type": "string", "minLength": 1},
         "generated_at": {"type": "integer", "minimum": 0},
         "source_revision": {"type": "string", "minLength": 1},
