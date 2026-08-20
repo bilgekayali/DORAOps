@@ -1,0 +1,164 @@
+name: Resilience Assurance Portfolio Boundary
+
+on:
+  push:
+    branches:
+      - main
+      - "agent/**"
+    paths:
+      - "src/doraops/assurance.py"
+      - "src/doraops/_release.py"
+      - "schemas/assurance-policy.schema.json"
+      - "schemas/domain-assurance-summary.schema.json"
+      - "schemas/entity-provider-exposure.schema.json"
+      - "schemas/entity-assurance-position.schema.json"
+      - "schemas/provider-portfolio-exposure.schema.json"
+      - "schemas/portfolio-assurance-snapshot.schema.json"
+      - "schemas/governance-dossier.schema.json"
+      - "tests/test_assurance.py"
+      - "pyproject.toml"
+      - ".github/workflows/assurance-portfolio.yml"
+  pull_request:
+    paths:
+      - "src/doraops/assurance.py"
+      - "src/doraops/_release.py"
+      - "schemas/assurance-policy.schema.json"
+      - "schemas/domain-assurance-summary.schema.json"
+      - "schemas/entity-provider-exposure.schema.json"
+      - "schemas/entity-assurance-position.schema.json"
+      - "schemas/provider-portfolio-exposure.schema.json"
+      - "schemas/portfolio-assurance-snapshot.schema.json"
+      - "schemas/governance-dossier.schema.json"
+      - "tests/test_assurance.py"
+      - "pyproject.toml"
+      - ".github/workflows/assurance-portfolio.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  assurance-portfolio-boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install package
+        run: python -m pip install -e '.[dev]'
+      - name: Run v0.4 assurance tests
+        run: python -m pytest tests/test_assurance.py -q
+      - name: Verify assurance schemas and structural non-claims
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import jsonschema
+
+          names = (
+              "assurance-policy.schema.json",
+              "domain-assurance-summary.schema.json",
+              "entity-provider-exposure.schema.json",
+              "entity-assurance-position.schema.json",
+              "provider-portfolio-exposure.schema.json",
+              "portfolio-assurance-snapshot.schema.json",
+          )
+          for name in names:
+              payload = json.loads((Path("schemas") / name).read_text(encoding="utf-8"))
+              assert payload["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+              assert payload["additionalProperties"] is False
+              jsonschema.Draft202012Validator.check_schema(payload)
+
+          entity = json.loads(Path("schemas/entity-assurance-position.schema.json").read_text())
+          for field in (
+              "dora_compliance_determined",
+              "operational_resilience_determined",
+              "supervisory_acceptance_determined",
+          ):
+              assert entity["properties"][field]["const"] is False
+          assert entity["properties"]["requires_human_review"]["const"] is True
+
+          provider = json.loads(Path("schemas/provider-portfolio-exposure.schema.json").read_text())
+          assert provider["properties"]["legal_concentration_risk_determined"]["const"] is False
+
+          snapshot = json.loads(Path("schemas/portfolio-assurance-snapshot.schema.json").read_text())
+          for field in (
+              "dora_compliance_determined",
+              "operational_resilience_determined",
+              "supervisory_acceptance_determined",
+              "legal_concentration_risk_determined",
+          ):
+              assert snapshot["properties"][field]["const"] is False
+          assert snapshot["properties"]["requires_human_review"]["const"] is True
+          PY
+      - name: Verify offline assurance capability boundary
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+
+          path = Path("src/doraops/assurance.py")
+          source = path.read_text(encoding="utf-8")
+          tree = ast.parse(source, filename=str(path))
+          banned_modules = {
+              "asyncio",
+              "ftplib",
+              "http",
+              "httpx",
+              "requests",
+              "socket",
+              "subprocess",
+              "telnetlib",
+              "urllib",
+          }
+          banned_calls = {
+              "connect",
+              "deploy",
+              "invoke",
+              "post",
+              "put",
+              "request",
+              "send",
+              "submit",
+              "urlopen",
+          }
+          for node in ast.walk(tree):
+              if isinstance(node, ast.Import):
+                  for alias in node.names:
+                      assert alias.name.split(".")[0] not in banned_modules, alias.name
+              elif isinstance(node, ast.ImportFrom):
+                  if node.module:
+                      assert node.module.split(".")[0] not in banned_modules, node.module
+              elif isinstance(node, ast.Call):
+                  func = node.func
+                  name = func.attr if isinstance(func, ast.Attribute) else func.id if isinstance(func, ast.Name) else None
+                  assert name not in banned_calls, name
+          assert "compliance_score" not in source
+          assert "maturity_score" not in source
+          PY
+      - name: Verify assurance source invariants
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import doraops
+
+          assert doraops.__version__ == "0.4.0"
+          assert doraops.RELEASE_VERSION == "0.4.0"
+          source = Path("src/doraops/assurance.py").read_text(encoding="utf-8")
+          markers = (
+              'AssuranceState.REVALIDATION_REQUIRED: 4',
+              'assurance policy versions must be contiguous',
+              'assurance dossier history cannot be backdated',
+              'portfolio assurance snapshot sequences must be contiguous',
+              'portfolio snapshot position is stale for latest registered dossier',
+              'portfolio assurance snapshot uses a stale policy',
+              'dora_compliance_determined: bool = False',
+              'operational_resilience_determined: bool = False',
+              'supervisory_acceptance_determined: bool = False',
+              'legal_concentration_risk_determined: bool = False',
+              'requires_human_review: bool = True',
+              'verify_dossier_document(document)',
+          )
+          for marker in markers:
+              assert marker in source, marker
+          PY
