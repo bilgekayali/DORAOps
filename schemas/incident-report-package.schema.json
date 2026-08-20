@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/incident-report-package.schema.json",
+  "title": "DORAOps Incident Report Package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "report_type", "sequence", "revision", "incident_evidence_snapshot_digest", "classification_review_digest", "applicability_decision_digest", "route_digest", "rts_content_profile", "its_template_profile", "required_content_evidence_digest", "report_payload_digest", "prepared_by_id", "prepared_at", "supersedes_package_digest"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "report_type": {"enum": ["initial_notification", "intermediate_report", "final_report", "reclassification_notification"]},
+    "sequence": {"type": "integer", "minimum": 1},
+    "revision": {"type": "integer", "minimum": 1},
+    "incident_evidence_snapshot_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "classification_review_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "applicability_decision_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "route_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "rts_content_profile": {"const": "EU-2025-301@2025-02-20"},
+    "its_template_profile": {"const": "EU-2025-302-ANNEX-I@2025-02-20"},
+    "required_content_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "report_payload_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "prepared_by_id": {"type": "string", "minLength": 1},
+    "prepared_at": {"type": "integer", "minimum": 0},
+    "supersedes_package_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"report_type": {"not": {"const": "intermediate_report"}}}},
+      "then": {"properties": {"sequence": {"const": 1}}}
+    },
+    {
+      "if": {"properties": {"revision": {"const": 1}}},
+      "then": {"properties": {"supersedes_package_digest": {"const": null}}}
+    },
+    {
+      "if": {"properties": {"revision": {"minimum": 2}}},
+      "then": {"properties": {"supersedes_package_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}
+    }
+  ]
+}
