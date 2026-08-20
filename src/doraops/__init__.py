@@ -60,7 +60,6 @@ from .reporting import (
     DelayNotificationEvidence,
     IncidentReportPackage,
     IncidentReportType,
-    IncidentReportingRegistry,
     IncidentReportingRoute,
     ITS_TEMPLATE_PROFILE,
     ReportingApplicability,
@@ -73,6 +72,17 @@ from .reporting import (
     SubmissionMode,
     SubmissionReceiptEvidence,
     assess_reporting_workflow,
+)
+from .reporting_strict import IncidentReportingRegistry
+from .reporting_audit import (
+    applicability_history,
+    authority_acknowledgements,
+    deadline_adjustment_history,
+    delay_notification_history,
+    package_history,
+    reporting_routes,
+    route_history,
+    submission_receipts,
 )
 from .resilience import (
     FindingResolution,
@@ -156,8 +166,8 @@ from .dossier import (
     GovernanceDossier,
     dossier_document,
 )
-from .dossier_strict import GovernanceDossierBuilder
-from .dossier_verify_strict import verify_dossier_document
+from .dossier_reporting import GovernanceDossierBuilder
+from .dossier_verify_reporting import verify_dossier_document
 
 __all__ = [
     "canonical_json",
@@ -223,6 +233,14 @@ __all__ = [
     "SubmissionMode",
     "SubmissionReceiptEvidence",
     "assess_reporting_workflow",
+    "applicability_history",
+    "authority_acknowledgements",
+    "deadline_adjustment_history",
+    "delay_notification_history",
+    "package_history",
+    "reporting_routes",
+    "route_history",
+    "submission_receipts",
     "FindingResolution",
     "FindingSeverity",
     "FindingStatus",
