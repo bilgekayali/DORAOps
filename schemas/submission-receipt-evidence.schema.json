@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/submission-receipt-evidence.schema.json",
+  "title": "DORAOps Submission Receipt Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "report_type", "sequence", "package_digest", "submitted_at", "channel", "external_submission_evidence_digest", "authority_reference", "technical_impossibility_evidence_digest"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "report_type": {"enum": ["initial_notification", "intermediate_report", "final_report", "reclassification_notification"]},
+    "sequence": {"type": "integer", "minimum": 1},
+    "package_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "submitted_at": {"type": "integer", "minimum": 0},
+    "channel": {"enum": ["portal", "api", "email", "alternative", "other"]},
+    "external_submission_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "authority_reference": {"type": ["string", "null"], "minLength": 1},
+    "technical_impossibility_evidence_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"channel": {"const": "alternative"}}},
+      "then": {"properties": {"technical_impossibility_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}
+    },
+    {
+      "if": {"properties": {"channel": {"not": {"const": "alternative"}}}},
+      "then": {"properties": {"technical_impossibility_evidence_digest": {"const": null}}}
+    }
+  ]
+}
