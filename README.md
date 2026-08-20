@@ -4,19 +4,49 @@
 
 ## Summary
 
-DORAOps is an open-source reference architecture for structuring and evidencing Digital Operational Resilience Act governance across ICT-supported business functions, services/processes, information and ICT assets, ICT risk, incidents, resilience testing, business-service continuity/recovery, incident-reporting workflows and ICT third-party dependencies.
+DORAOps is an open-source reference architecture for structuring and evidencing Digital Operational Resilience Act governance across ICT-supported business functions, services/processes, information and ICT assets, ICT risk, incidents, resilience testing, business-service continuity/recovery, incident-reporting workflows, ICT third-party dependencies and executive resilience-assurance views.
 
-Current package boundary: **DORAOps v0.3.0**.
+Current package boundary: **DORAOps v0.4.0**.
 
-The project is not a legal-compliance engine, disaster-recovery executor, production failover controller, supervisory reporting service, regulator filing gateway, or certification product.
+The project is not a legal-compliance engine, disaster-recovery executor, production failover controller, supervisory reporting service, regulator filing gateway, certification product, legal concentration-risk engine or operational-resilience scoring product.
 
-## v0.3.0 advanced incident-reporting workflow evidence
+## v0.4.0 resilience assurance and portfolio views
+
+v0.4.0 adds a deterministic, offline assurance layer over verified DORAOps governance dossiers:
+
+`verified governance dossier → entity assurance position → provider exposure aggregation → portfolio assurance snapshot`
+
+The v0.4 boundary includes:
+
+- append-only, institution-owned `AssurancePolicy` versions defining required domains, dossier freshness and executive provider-concentration thresholds;
+- verified-dossier ingestion only: aggregate views are derived from dossiers that pass the existing offline semantic verifier;
+- deterministic domain summaries for ICT risk, incidents, incident reporting, resilience testing, continuity/recovery and ICT third-party evidence;
+- fail-closed state precedence `revalidation_required > breached > incomplete > attention > healthy`;
+- high/critical residual ICT risk, major incidents, pending reporting workflows, difficult substitutability and represented high/critical dependency concentration surfaced as `attention`, not promoted into a regulatory breach;
+- `breached` reserved for underlying domain evidence that itself represents a breach/block state, such as a reporting-deadline breach, recovery-objective breach or blocked resilience-test lifecycle;
+- missing policy-required domains surfaced as `incomplete` rather than silently omitted;
+- dossier age exceeding the institution-owned policy threshold surfaced as `revalidation_required` even when historical digests remain valid;
+- critical/important business-function references derived from exact inventory evidence;
+- direct-provider exposure derived from represented third-party arrangements, including supported functions, critical/important functions and high/critical dependency-concentration observations;
+- cross-entity provider aggregation showing entity count, arrangement count and critical-function references;
+- institution-owned provider/entity and provider/critical-function thresholds that surface executive `attention` without determining legal ICT concentration risk;
+- append-only portfolio snapshot sequences, deterministic rebuild checks and historical-vs-current separation;
+- historical snapshots remain verifiable after later dossier/policy drift, while `assert_snapshot_current()` requires latest policy, latest sequence and latest dossier digest for every entity;
+- strict Draft 2020-12 schemas and structural non-claims for entity/provider/portfolio assurance artifacts;
+- no compliance percentage, maturity score or automatic management-body conclusion;
+- generic Python 3.11/3.12/3.13 CI plus a dedicated Resilience Assurance Portfolio Boundary gate.
+
+Entity and portfolio assurance artifacts structurally require `dora_compliance_determined=false`, `operational_resilience_determined=false`, `supervisory_acceptance_determined=false` and `requires_human_review=true`. Provider/portfolio concentration artifacts additionally require `legal_concentration_risk_determined=false`.
+
+See [`docs/RESILIENCE_ASSURANCE.md`](docs/RESILIENCE_ASSURANCE.md) for the detailed aggregate-evidence semantics.
+
+## v0.3.0 advanced incident-reporting workflow evidence retained
 
 v0.3.0 extends the retained incident-evidence foundation with an offline, append-only reporting-governance workflow:
 
 `incident evidence snapshot → human classification review → human reporting-applicability decision → reporting route → report package/revision → external submission receipt → optional authority acknowledgement → workflow assessment → governance dossier`
 
-The v0.3 boundary includes:
+The retained v0.3 boundary includes:
 
 - exact binding to the existing append-only ICT incident evidence snapshot and accountable human classification review;
 - versioned, human-owned reporting-applicability decisions rather than autonomous legal reportability;
@@ -36,7 +66,7 @@ The v0.3 boundary includes:
 - deterministic `not_required`, `incomplete`, `pending`, `breached`, `complete` and `revalidation_required` workflow states;
 - historical applicability, route, package-revision, receipt, acknowledgement, deadline-adjustment and delay-notice evidence retained separately from current eligibility;
 - reporting artifacts integrated into the governance dossier with offline semantic recomputation and tamper-resistant cross-binding;
-- strict Draft 2020-12 schemas, adversarial tests, generic Python 3.11/3.12/3.13 CI and a dedicated Incident Reporting Boundary gate.
+- strict Draft 2020-12 schemas, adversarial tests, generic CI and a dedicated Incident Reporting Boundary gate.
 
 The reporting core performs no HTTP/API/email submission and does not contain autonomous competent-authority routing or legal-applicability logic.
 
@@ -86,7 +116,7 @@ Retained controls include:
 - explicit provider designation, substitutability and concentration observations;
 - institution-owned third-party gap/freshness policy and exit/transition-plan evidence.
 
-Existing resilience-test, continuity/recovery and incident-reporting domains remain intentionally distinct. Evidence in one domain does not silently establish a conclusion in another.
+Existing resilience-test, continuity/recovery, incident-reporting and assurance domains remain intentionally distinct. Aggregate evidence does not silently establish a conclusion in an underlying domain and underlying evidence does not silently establish a legal portfolio conclusion.
 
 ## Governance dossier
 
@@ -100,7 +130,7 @@ Dossier artifacts carry one of three states:
 
 The dossier contains an `inventory_snapshot_manifest` whose canonical digest reproduces the exact `InventoryRegistry.snapshot_digest`. The outer dossier also carries its own SHA-256 digest. Offline verification recomputes the outer digest, every embedded artifact digest and supported semantic cross-bindings before accepting the document.
 
-The v1 dossier envelope is retained in v0.3.0 because its structural envelope did not change; only `release_version` advances to `0.3.0`, with continuity and incident-reporting artifacts carried as governed domains.
+The v1 dossier envelope is retained in v0.4.0 because its structural envelope did not change; only `release_version` advances to `0.4.0`. The assurance layer consumes these verified dossiers rather than changing their domain semantics.
 
 A dossier state is an integrity/governance status for represented evidence. It is not a compliance conclusion.
 
@@ -117,12 +147,15 @@ doraops dossier verify governance-dossier.json
 
 `digest` canonicalizes JSON before hashing. `schema` validates Draft 2020-12 schemas. `dossier verify` checks the dossier envelope, embedded artifact digests, aggregate state/findings consistency, inventory snapshot-manifest binding and supported continuity/reporting cross-bindings without network access.
 
+The v0.4 assurance API is exposed through `doraops.assurance`; it does not add a networked portfolio service or deployment endpoint.
+
 ## Regulatory design posture
 
 Primary design inputs include:
 
-- Regulation (EU) 2022/2554 (DORA), including identification/classification, ICT risk management, incident governance/reporting, response/recovery, digital operational resilience testing and ICT third-party governance;
+- Regulation (EU) 2022/2554 (DORA), including governance, ICT risk management, incident governance/reporting, response/recovery, digital operational resilience testing and ICT third-party governance;
 - Commission Delegated Regulation (EU) 2024/1774 on ICT risk-management tools, methods, processes and policies;
+- Commission Delegated Regulation (EU) 2024/1773 on contractual arrangements for ICT services supporting critical or important functions;
 - Commission Implementing Regulation (EU) 2024/2956 on standard templates for the register of information and ICT third-party supply-chain relationships;
 - Commission Delegated Regulation (EU) 2025/301 for major ICT-incident reporting content/timing design;
 - Commission Implementing Regulation (EU) 2025/302 and Annex I for the represented major ICT-incident reporting template/procedure workflow.
@@ -133,9 +166,13 @@ The internal `EU-2024-2956-support-v1` third-party mapping profile is intended t
 
 ## Explicit non-claims
 
-DORAOps v0.3.0 does **not** by itself establish:
+DORAOps v0.4.0 does **not** by itself establish:
 
 - DORA compliance or legal applicability;
+- an operational-resilience or compliance score;
+- management-body approval or supervisory acceptance of an assurance snapshot;
+- legal ICT concentration risk merely because an institution-owned portfolio threshold is reached;
+- critical ICT third-party provider designation;
 - correct legal incident reportability or competent-authority jurisdiction;
 - supervisory or competent-authority acceptance;
 - successful regulatory filing merely because a report package or receipt is represented;
@@ -148,7 +185,6 @@ DORAOps v0.3.0 does **not** by itself establish:
 - absence of vulnerabilities;
 - successful or regulator-recognized TLPT;
 - lawful/approved risk acceptance;
-- critical ICT third-party provider designation;
 - contractual sufficiency.
 
 Those conclusions remain institution-, evidence-, regulator- and human-review dependent.
@@ -157,17 +193,18 @@ Those conclusions remain institution-, evidence-, regulator- and human-review de
 
 - exact entity and governed-snapshot binding;
 - deterministic canonical JSON and SHA-256 evidence;
-- explicit human criticality, applicability, treatment, classification, reporting-applicability, recovery-objective and provider-designation decisions;
+- explicit human criticality, applicability, treatment, classification, reporting-applicability, recovery-objective, provider-designation and assurance-policy decisions;
 - fail-closed stale, incomplete, conflicting, dangling and cross-scope references;
 - immutable historical evidence rather than silent overwrite;
-- objective assessment over supplied evidence rather than autonomous claims about real-world recovery or legal reporting outcomes;
+- historical verification separated from current eligibility;
+- executive aggregation over verified evidence rather than autonomous compliance or maturity scoring;
 - qualified or regulatory claims require explicit evidence rather than inference from labels;
 - offline-verifiable release evidence where possible;
 - governance core does not execute production recovery, failover or autonomous regulatory submission.
 
 ## Roadmap direction
 
-`v0.1 DORA governance foundation → v0.2 continuity/recovery evidence → v0.3 incident-reporting workflow evidence → v0.4 resilience assurance/portfolio views → later production hardening`
+`v0.1 DORA governance foundation → v0.2 continuity/recovery evidence → v0.3 incident-reporting workflow evidence → v0.4 resilience assurance/portfolio views → later tenant/crypto and production hardening`
 
 ## License
 
