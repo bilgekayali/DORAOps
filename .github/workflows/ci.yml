@@ -56,14 +56,24 @@ jobs:
               ReportingWorkflowAssessment,
               RecoveryObjectiveProfile,
           )
-          assert doraops.__version__ == "0.3.0"
-          assert doraops.RELEASE_VERSION == "0.3.0"
+          from doraops.assurance import (
+              AssurancePolicy,
+              AssuranceState,
+              PortfolioAssuranceRegistry,
+              PortfolioAssuranceSnapshot,
+          )
+          assert doraops.__version__ == "0.4.0"
+          assert doraops.RELEASE_VERSION == "0.4.0"
           assert RecoveryObjectiveProfile is not None
           assert GovernanceDossierBuilder is not None
           assert DependencyImpactSnapshot is not None
           assert IncidentReportingRegistry is not None
           assert ReportingApplicabilityDecision is not None
           assert ReportingWorkflowAssessment is not None
+          assert AssurancePolicy is not None
+          assert AssuranceState is not None
+          assert PortfolioAssuranceRegistry is not None
+          assert PortfolioAssuranceSnapshot is not None
           assert hasattr(GovernanceDossierBuilder, "add_incident_reporting")
           print(doraops.__version__)
           PY
