@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/deadline-adjustment-evidence.schema.json",
+  "title": "DORAOps Deadline Adjustment Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "report_type", "sequence", "original_due_at", "adjusted_due_at", "reason", "approved_by_id", "calendar_evidence_digest"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "report_type": {"enum": ["initial_notification", "intermediate_report", "final_report", "reclassification_notification"]},
+    "sequence": {"type": "integer", "minimum": 1},
+    "original_due_at": {"type": "integer", "minimum": 0},
+    "adjusted_due_at": {"type": "integer", "minimum": 0},
+    "reason": {"const": "weekend_or_bank_holiday"},
+    "approved_by_id": {"type": "string", "minLength": 1},
+    "calendar_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
