@@ -331,7 +331,9 @@ def test_full_initial_intermediate_final_workflow_completes_and_uses_calendar_mo
     )
     assert assessment.state is ReportingWorkflowState.COMPLETE
     final_deadline = next(item for item in assessment.deadlines if item.report_type is IncidentReportType.FINAL)
-    expected = datetime.fromtimestamp(intermediate_receipt.submitted_at, tz=timezone.utc).replace(month=2)
+    intermediate_time = datetime.fromtimestamp(intermediate_receipt.submitted_at, tz=timezone.utc)
+    assert intermediate_time == datetime(2027, 1, 31, 11, 30, tzinfo=timezone.utc)
+    expected = datetime(2027, 2, 28, 11, 30, tzinfo=timezone.utc)
     assert final_deadline.statutory_due_at == int(expected.timestamp())
     assert assessment.findings == ()
 
