@@ -16,8 +16,8 @@ jobs:
         python-version: ["3.11", "3.12", "3.13"]
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       - name: Upgrade packaging tools
@@ -33,7 +33,9 @@ jobs:
           from pathlib import Path
           import jsonschema
           for path in sorted(Path("schemas").glob("*.schema.json")):
-              jsonschema.Draft202012Validator.check_schema(json.loads(path.read_text(encoding="utf-8")))
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              assert payload["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+              jsonschema.Draft202012Validator.check_schema(payload)
               print(path)
           PY
       - name: Build wheel
@@ -46,12 +48,23 @@ jobs:
           /tmp/doraops-wheel/bin/python -m pip install dist/*.whl
           /tmp/doraops-wheel/bin/python - <<'PY'
           import doraops
-          from doraops import RecoveryObjectiveProfile, GovernanceDossierBuilder, DependencyImpactSnapshot
-          assert doraops.__version__ == "0.2.0"
-          assert doraops.RELEASE_VERSION == "0.2.0"
+          from doraops import (
+              DependencyImpactSnapshot,
+              GovernanceDossierBuilder,
+              IncidentReportingRegistry,
+              ReportingApplicabilityDecision,
+              ReportingWorkflowAssessment,
+              RecoveryObjectiveProfile,
+          )
+          assert doraops.__version__ == "0.3.0"
+          assert doraops.RELEASE_VERSION == "0.3.0"
           assert RecoveryObjectiveProfile is not None
           assert GovernanceDossierBuilder is not None
           assert DependencyImpactSnapshot is not None
+          assert IncidentReportingRegistry is not None
+          assert ReportingApplicabilityDecision is not None
+          assert ReportingWorkflowAssessment is not None
+          assert hasattr(GovernanceDossierBuilder, "add_incident_reporting")
           print(doraops.__version__)
           PY
           /tmp/doraops-wheel/bin/doraops --version
