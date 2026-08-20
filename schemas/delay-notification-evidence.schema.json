@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/delay-notification-evidence.schema.json",
+  "title": "DORAOps Delay Notification Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "report_type", "sequence", "due_at", "notified_at", "reason_evidence_digest", "authority_notification_evidence_digest"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "report_type": {"enum": ["initial_notification", "intermediate_report", "final_report", "reclassification_notification"]},
+    "sequence": {"type": "integer", "minimum": 1},
+    "due_at": {"type": "integer", "minimum": 0},
+    "notified_at": {"type": "integer", "minimum": 0},
+    "reason_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "authority_notification_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
