@@ -1,0 +1,151 @@
+name: Incident Reporting Boundary
+
+on:
+  push:
+    branches:
+      - main
+      - "agent/**"
+    paths:
+      - "src/doraops/reporting*.py"
+      - "src/doraops/dossier_reporting.py"
+      - "src/doraops/dossier_verify_reporting.py"
+      - "src/doraops/__init__.py"
+      - "src/doraops/_release.py"
+      - "schemas/*report*.schema.json"
+      - "schemas/submission-receipt-evidence.schema.json"
+      - "schemas/authority-acknowledgement-evidence.schema.json"
+      - "schemas/deadline-adjustment-evidence.schema.json"
+      - "schemas/delay-notification-evidence.schema.json"
+      - "schemas/governance-dossier.schema.json"
+      - "tests/test_reporting*.py"
+      - "pyproject.toml"
+      - ".github/workflows/incident-reporting.yml"
+  pull_request:
+    paths:
+      - "src/doraops/reporting*.py"
+      - "src/doraops/dossier_reporting.py"
+      - "src/doraops/dossier_verify_reporting.py"
+      - "src/doraops/__init__.py"
+      - "src/doraops/_release.py"
+      - "schemas/*report*.schema.json"
+      - "schemas/submission-receipt-evidence.schema.json"
+      - "schemas/authority-acknowledgement-evidence.schema.json"
+      - "schemas/deadline-adjustment-evidence.schema.json"
+      - "schemas/delay-notification-evidence.schema.json"
+      - "schemas/governance-dossier.schema.json"
+      - "tests/test_reporting*.py"
+      - "pyproject.toml"
+      - ".github/workflows/incident-reporting.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  incident-reporting-boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install package
+        run: python -m pip install -e '.[dev]'
+      - name: Run v0.3 reporting tests
+        run: python -m pytest tests/test_reporting*.py -q
+      - name: Verify reporting schemas and pinned non-claims
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import jsonschema
+
+          names = (
+              "reporting-applicability-decision.schema.json",
+              "incident-reporting-route.schema.json",
+              "incident-report-package.schema.json",
+              "submission-receipt-evidence.schema.json",
+              "authority-acknowledgement-evidence.schema.json",
+              "deadline-adjustment-evidence.schema.json",
+              "delay-notification-evidence.schema.json",
+              "reporting-deadline.schema.json",
+              "reporting-workflow-assessment.schema.json",
+          )
+          for name in names:
+              payload = json.loads((Path("schemas") / name).read_text(encoding="utf-8"))
+              assert payload["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+              assert payload["additionalProperties"] is False
+              jsonschema.Draft202012Validator.check_schema(payload)
+
+          package = json.loads(Path("schemas/incident-report-package.schema.json").read_text())
+          assert package["properties"]["rts_content_profile"]["const"] == "EU-2025-301@2025-02-20"
+          assert package["properties"]["its_template_profile"]["const"] == "EU-2025-302-ANNEX-I@2025-02-20"
+          assessment = json.loads(Path("schemas/reporting-workflow-assessment.schema.json").read_text())
+          assert assessment["properties"]["regulatory_compliance_determined"]["const"] is False
+          assert assessment["properties"]["authority_acceptance_determined"]["const"] is False
+          PY
+      - name: Verify offline reporting capability boundary
+        run: |
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+
+          paths = (
+              Path("src/doraops/reporting.py"),
+              Path("src/doraops/reporting_strict.py"),
+              Path("src/doraops/reporting_audit.py"),
+              Path("src/doraops/dossier_reporting.py"),
+              Path("src/doraops/dossier_verify_reporting.py"),
+          )
+          banned_modules = {
+              "asyncio",
+              "ftplib",
+              "http",
+              "httpx",
+              "requests",
+              "socket",
+              "subprocess",
+              "telnetlib",
+              "urllib",
+          }
+          banned_calls = {"connect", "post", "put", "request", "send", "urlopen"}
+          for path in paths:
+              source = path.read_text(encoding="utf-8")
+              tree = ast.parse(source, filename=str(path))
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.Import):
+                      for alias in node.names:
+                          assert alias.name.split(".")[0] not in banned_modules, (path, alias.name)
+                  elif isinstance(node, ast.ImportFrom):
+                      if node.module:
+                          assert node.module.split(".")[0] not in banned_modules, (path, node.module)
+                  elif isinstance(node, ast.Call):
+                      func = node.func
+                      name = func.attr if isinstance(func, ast.Attribute) else func.id if isinstance(func, ast.Name) else None
+                      assert name not in banned_calls, (path, name)
+          PY
+      - name: Verify reporting source invariants
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          source = Path("src/doraops/reporting.py").read_text(encoding="utf-8")
+          strict = Path("src/doraops/reporting_strict.py").read_text(encoding="utf-8")
+          verifier = Path("src/doraops/dossier_verify_reporting.py").read_text(encoding="utf-8")
+          markers = (
+              'RTS_CONTENT_PROFILE = "EU-2025-301@2025-02-20"',
+              'ITS_TEMPLATE_PROFILE = "EU-2025-302-ANNEX-I@2025-02-20"',
+              '_INITIAL_CLASSIFICATION_SECONDS = 4 * 60 * 60',
+              '_INITIAL_AWARENESS_SECONDS = 24 * 60 * 60',
+              '_INTERMEDIATE_SECONDS = 72 * 60 * 60',
+              'RECOVERY_UPDATE_WITHOUT_UNDUE_DELAY',
+              'FINAL_ONE_CALENDAR_MONTH',
+              'regulatory_compliance_determined: bool = False',
+              'authority_acceptance_determined: bool = False',
+              'deadline_breached_with_timely_delay_notice',
+              'technical-impossibility evidence',
+          )
+          for marker in markers:
+              assert marker in source, marker
+          assert 'decision_id must remain stable across versions' in strict
+          assert 'without-undue-delay reporting obligation cannot fabricate numeric deadline' in verifier
+          assert 'incident reporting initial deadline is inconsistent' in verifier
+          PY
