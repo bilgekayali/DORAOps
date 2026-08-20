@@ -38,6 +38,25 @@ def route_history(
     return tuple(registry._routes.get((entity_id, route_id), ()))
 
 
+def reporting_routes(
+    registry: IncidentReportingRegistry,
+    entity_id: str,
+) -> tuple[IncidentReportingRoute, ...]:
+    registry = _registry(registry)
+    result = [
+        route
+        for (entity, _route_id), versions in registry._routes.items()
+        if entity == entity_id
+        for route in versions
+    ]
+    return tuple(
+        sorted(
+            result,
+            key=lambda item: (item.route_id, item.version, item.registered_at),
+        )
+    )
+
+
 def package_history(
     registry: IncidentReportingRegistry,
     entity_id: str,
