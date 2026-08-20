@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/reporting-deadline.schema.json",
+  "title": "DORAOps Reporting Deadline",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "report_type", "sequence", "basis", "triggered_at", "statutory_due_at", "effective_due_at", "adjustment_digest"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "report_type": {"enum": ["initial_notification", "intermediate_report", "final_report", "reclassification_notification"]},
+    "sequence": {"type": "integer", "minimum": 1},
+    "basis": {"enum": ["initial_classification_4h", "initial_awareness_24h", "intermediate_72h", "recovery_update_without_undue_delay", "final_one_calendar_month"]},
+    "triggered_at": {"type": "integer", "minimum": 0},
+    "statutory_due_at": {"type": ["integer", "null"], "minimum": 0},
+    "effective_due_at": {"type": ["integer", "null"], "minimum": 0},
+    "adjustment_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"basis": {"const": "recovery_update_without_undue_delay"}}},
+      "then": {
+        "properties": {
+          "statutory_due_at": {"const": null},
+          "effective_due_at": {"const": null},
+          "adjustment_digest": {"const": null}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"basis": {"not": {"const": "recovery_update_without_undue_delay"}}}},
+      "then": {
+        "properties": {
+          "statutory_due_at": {"type": "integer", "minimum": 0},
+          "effective_due_at": {"type": "integer", "minimum": 0}
+        }
+      }
+    }
+  ]
+}
