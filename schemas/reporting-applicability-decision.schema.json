@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/reporting-applicability-decision.schema.json",
+  "title": "DORAOps Reporting Applicability Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "decision_id", "decision_version", "incident_evidence_snapshot_digest", "classification_review_digest", "applicability", "decision_owner_id", "rationale_digest", "applicability_evidence_digest", "decided_at"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "decision_id": {"type": "string", "minLength": 1},
+    "decision_version": {"type": "integer", "minimum": 1},
+    "incident_evidence_snapshot_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "classification_review_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "applicability": {"enum": ["applicable", "not_applicable"]},
+    "decision_owner_id": {"type": "string", "minLength": 1},
+    "rationale_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "applicability_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "decided_at": {"type": "integer", "minimum": 0}
+  }
+}

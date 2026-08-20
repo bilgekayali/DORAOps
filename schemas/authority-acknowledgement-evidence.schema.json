@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/authority-acknowledgement-evidence.schema.json",
+  "title": "DORAOps Authority Acknowledgement Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "receipt_digest", "status", "acknowledged_at", "authority_reference", "acknowledgement_evidence_digest"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "receipt_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "status": {"enum": ["received", "accepted", "rejected", "technical_error"]},
+    "acknowledged_at": {"type": "integer", "minimum": 0},
+    "authority_reference": {"type": "string", "minLength": 1},
+    "acknowledgement_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

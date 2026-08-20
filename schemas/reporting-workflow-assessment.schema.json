@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/reporting-workflow-assessment.schema.json",
+  "title": "DORAOps Reporting Workflow Assessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "incident_id", "incident_evidence_snapshot_digest", "classification_review_digest", "applicability_decision_digest", "route_digest", "assessed_at", "state", "deadlines", "latest_package_digests", "latest_receipt_digests", "findings", "regulatory_compliance_determined", "authority_acceptance_determined"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "incident_id": {"type": "string", "minLength": 1},
+    "incident_evidence_snapshot_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "classification_review_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "applicability_decision_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "route_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "assessed_at": {"type": "integer", "minimum": 0},
+    "state": {"enum": ["not_required", "incomplete", "pending", "breached", "complete", "revalidation_required"]},
+    "deadlines": {
+      "type": "array",
+      "items": {"$ref": "reporting-deadline.schema.json"}
+    },
+    "latest_package_digests": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    },
+    "latest_receipt_digests": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+    },
+    "findings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "regulatory_compliance_determined": {"const": false},
+    "authority_acceptance_determined": {"const": false}
+  }
+}

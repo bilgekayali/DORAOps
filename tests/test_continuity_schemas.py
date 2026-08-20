@@ -35,9 +35,14 @@ def payload(value):
     return json.loads(canonical_json(value))
 
 
+def version_tuple(value: str) -> tuple[int, int, int]:
+    major, minor, patch = value.split(".")[:3]
+    return int(major), int(minor), int(patch)
+
+
 def test_v02_release_versions_are_aligned() -> None:
-    assert doraops.__version__ == "0.2.0"
-    assert doraops.RELEASE_VERSION == "0.2.0"
+    assert version_tuple(doraops.__version__) >= (0, 2, 0)
+    assert doraops.RELEASE_VERSION == doraops.__version__
 
 
 def test_continuity_runtime_artifacts_validate_against_strict_schemas() -> None:
@@ -113,6 +118,8 @@ def test_continuity_non_claim_fields_are_locked_in_schema() -> None:
     assert impact["properties"]["runtime_impact_determined"]["const"] is False
 
 
-def test_governance_dossier_schema_is_v02_release_boundary() -> None:
+def test_governance_dossier_schema_retains_v02_envelope_under_current_release() -> None:
     schema = contract("governance-dossier.schema.json")
-    assert schema["properties"]["dossier"]["properties"]["release_version"]["const"] == "0.2.0"
+    release = schema["properties"]["dossier"]["properties"]["release_version"]["const"]
+    assert release == doraops.RELEASE_VERSION
+    assert version_tuple(release) >= (0, 2, 0)
