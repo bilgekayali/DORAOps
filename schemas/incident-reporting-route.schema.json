@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/incident-reporting-route.schema.json",
+  "title": "DORAOps Incident Reporting Route",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["entity_id", "route_id", "version", "competent_authority_id", "member_state", "submission_mode", "submitter_id", "contact_evidence_digest", "outsourcing_evidence_digest", "authority_permission_evidence_digest", "aggregation_scope_evidence_digest", "registered_at"],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "route_id": {"type": "string", "minLength": 1},
+    "version": {"type": "integer", "minimum": 1},
+    "competent_authority_id": {"type": "string", "minLength": 1},
+    "member_state": {"type": "string", "minLength": 1},
+    "submission_mode": {"enum": ["direct", "outsourced", "aggregated"]},
+    "submitter_id": {"type": "string", "minLength": 1},
+    "contact_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "outsourcing_evidence_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "authority_permission_evidence_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "aggregation_scope_evidence_digest": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "registered_at": {"type": "integer", "minimum": 0}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"submission_mode": {"const": "direct"}}},
+      "then": {
+        "properties": {
+          "outsourcing_evidence_digest": {"const": null},
+          "authority_permission_evidence_digest": {"const": null},
+          "aggregation_scope_evidence_digest": {"const": null}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"submission_mode": {"const": "outsourced"}}},
+      "then": {
+        "properties": {
+          "outsourcing_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "authority_permission_evidence_digest": {"const": null},
+          "aggregation_scope_evidence_digest": {"const": null}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"submission_mode": {"const": "aggregated"}}},
+      "then": {
+        "properties": {
+          "outsourcing_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "authority_permission_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "aggregation_scope_evidence_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  ]
+}
