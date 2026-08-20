@@ -18,7 +18,7 @@ from .reporting_audit import (
     deadline_adjustment_history,
     delay_notification_history,
     package_history,
-    route_history,
+    reporting_routes,
     submission_receipts,
 )
 
@@ -68,17 +68,16 @@ class GovernanceDossierBuilder(_GovernanceDossierBuilder):
                 item,
             )
 
-        if route is not None:
-            route_versions = route_history(registry, route.entity_id, route.route_id)
-            if not route_versions:
-                raise GovernanceError("incident reporting route history is missing")
-            for item in route_versions:
-                self._add(
-                    "incident_reporting",
-                    "reporting_route",
-                    f"{item.route_id}:v{item.version}",
-                    item,
-                )
+        routes = reporting_routes(registry, self.entity_id)
+        if route is not None and not routes:
+            raise GovernanceError("incident reporting route history is missing")
+        for item in routes:
+            self._add(
+                "incident_reporting",
+                "reporting_route",
+                f"{item.route_id}:v{item.version}",
+                item,
+            )
 
         for item in package_history(registry, decision.entity_id, decision.incident_id):
             self._add(
