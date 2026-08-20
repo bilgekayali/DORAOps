@@ -4,6 +4,7 @@ from copy import deepcopy
 
 import pytest
 
+import doraops
 from doraops import (
     DependencyTraversalDirection,
     DossierState,
@@ -49,7 +50,7 @@ def build_continuity_dossier(*, breached: bool = False):
         registry,
         entity_id="bank-a",
         generated_at=300,
-        source_revision="v0.2-contract-under-v0.3",
+        source_revision="v0.2-contract-under-current-release",
     )
     builder.add_continuity_recovery(
         objective,
@@ -66,7 +67,7 @@ def test_current_continuity_evidence_is_packaged_and_verified_offline() -> None:
     *_, assessment, impact, dossier = build_continuity_dossier()
     assert assessment.state is RecoveryAssessmentState.MET
     assert impact.runtime_impact_determined is False
-    assert dossier.release_version == "0.3.0"
+    assert dossier.release_version == doraops.RELEASE_VERSION == doraops.__version__
     assert dossier.state is DossierState.CURRENT
     assert dossier.coverage["continuity"] >= 5
     document = dossier_document(dossier)
