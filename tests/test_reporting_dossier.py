@@ -4,6 +4,7 @@ from copy import deepcopy
 
 import pytest
 
+import doraops
 from doraops import (
     BusinessFunction,
     DossierState,
@@ -248,7 +249,7 @@ def build_complete_reporting_dossier():
         inventory,
         entity_id="bank-a",
         generated_at=assessment.assessed_at + 100,
-        source_revision="v0.3-release-candidate",
+        source_revision="v0.3-contract-under-current-release",
     )
     builder.add_incident(incidents, incident.incident_id, policy, review)
     builder.add_incident_reporting(
@@ -263,7 +264,7 @@ def build_complete_reporting_dossier():
 
 def test_complete_reporting_workflow_is_packaged_with_full_audit_history_and_verified_offline():
     reporting, assessment, dossier = build_complete_reporting_dossier()
-    assert dossier.release_version == "0.3.0"
+    assert dossier.release_version == doraops.RELEASE_VERSION == doraops.__version__
     assert dossier.state is DossierState.CURRENT
     assert dossier.coverage["incident_reporting"] >= 8
     assert len(package_history(reporting, "bank-a", "INC-DOSSIER-1")) == 3

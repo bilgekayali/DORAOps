@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/domain-assurance-summary.schema.json",
+  "title": "DORAOps v0.4 Domain Assurance Summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "domain",
+    "artifact_count",
+    "current_count",
+    "gap_count",
+    "revalidation_count",
+    "state",
+    "findings"
+  ],
+  "properties": {
+    "domain": {
+      "enum": [
+        "ict_risk",
+        "incident",
+        "incident_reporting",
+        "resilience_test",
+        "continuity",
+        "third_party"
+      ]
+    },
+    "artifact_count": {"type": "integer", "minimum": 0},
+    "current_count": {"type": "integer", "minimum": 0},
+    "gap_count": {"type": "integer", "minimum": 0},
+    "revalidation_count": {"type": "integer", "minimum": 0},
+    "state": {
+      "enum": ["healthy", "attention", "incomplete", "breached", "revalidation_required"]
+    },
+    "findings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}

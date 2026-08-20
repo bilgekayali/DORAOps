@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/entity-provider-exposure.schema.json",
+  "title": "DORAOps v0.4 Entity Provider Exposure",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "entity_id",
+    "provider_id",
+    "arrangement_ids",
+    "supported_function_ids",
+    "critical_function_ids",
+    "high_or_critical_observation_count"
+  ],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "provider_id": {"type": "string", "minLength": 1},
+    "arrangement_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "supported_function_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "critical_function_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "high_or_critical_observation_count": {"type": "integer", "minimum": 0}
+  }
+}

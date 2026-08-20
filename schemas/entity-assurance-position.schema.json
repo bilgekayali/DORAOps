@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/entity-assurance-position.schema.json",
+  "title": "DORAOps v0.4 Entity Assurance Position",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "entity_id",
+    "dossier_digest",
+    "dossier_generated_at",
+    "source_revision",
+    "policy_digest",
+    "assessed_at",
+    "freshness_state",
+    "domain_summaries",
+    "provider_exposures",
+    "critical_function_ids",
+    "state",
+    "findings",
+    "dora_compliance_determined",
+    "operational_resilience_determined",
+    "supervisory_acceptance_determined",
+    "requires_human_review"
+  ],
+  "properties": {
+    "entity_id": {"type": "string", "minLength": 1},
+    "dossier_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "dossier_generated_at": {"type": "integer", "minimum": 0},
+    "source_revision": {"type": "string", "minLength": 1},
+    "policy_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "assessed_at": {"type": "integer", "minimum": 0},
+    "freshness_state": {"enum": ["healthy", "revalidation_required"]},
+    "domain_summaries": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/domain_summary"}
+    },
+    "provider_exposures": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/entity_provider_exposure"}
+    },
+    "critical_function_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "state": {
+      "enum": ["healthy", "attention", "incomplete", "breached", "revalidation_required"]
+    },
+    "findings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "dora_compliance_determined": {"const": false},
+    "operational_resilience_determined": {"const": false},
+    "supervisory_acceptance_determined": {"const": false},
+    "requires_human_review": {"const": true}
+  },
+  "$defs": {
+    "domain_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain", "artifact_count", "current_count", "gap_count", "revalidation_count", "state", "findings"],
+      "properties": {
+        "domain": {"enum": ["ict_risk", "incident", "incident_reporting", "resilience_test", "continuity", "third_party"]},
+        "artifact_count": {"type": "integer", "minimum": 0},
+        "current_count": {"type": "integer", "minimum": 0},
+        "gap_count": {"type": "integer", "minimum": 0},
+        "revalidation_count": {"type": "integer", "minimum": 0},
+        "state": {"enum": ["healthy", "attention", "incomplete", "breached", "revalidation_required"]},
+        "findings": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "entity_provider_exposure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity_id", "provider_id", "arrangement_ids", "supported_function_ids", "critical_function_ids", "high_or_critical_observation_count"],
+      "properties": {
+        "entity_id": {"type": "string", "minLength": 1},
+        "provider_id": {"type": "string", "minLength": 1},
+        "arrangement_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "supported_function_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "critical_function_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "high_or_critical_observation_count": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}
