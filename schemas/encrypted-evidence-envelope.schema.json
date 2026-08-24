@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/bilgekayali/DORAOps/schemas/encrypted-evidence-envelope.schema.json",
+  "title": "DORAOps Encrypted Evidence Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "algorithm",
+    "entity_id",
+    "artifact_type",
+    "key_reference",
+    "nonce_b64url",
+    "ciphertext_b64url",
+    "aad_sha256",
+    "raw_content_logged",
+    "secrets_logged",
+    "production_key_management_validated"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "algorithm": {"const": "AES-256-GCM"},
+    "entity_id": {"type": "string", "minLength": 1},
+    "artifact_type": {"type": "string", "minLength": 1},
+    "key_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "key_id", "key_version"],
+      "properties": {
+        "provider": {"type": "string", "minLength": 1},
+        "key_id": {"type": "string", "minLength": 1},
+        "key_version": {"type": "string", "minLength": 1}
+      }
+    },
+    "nonce_b64url": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"},
+    "ciphertext_b64url": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"},
+    "aad_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "raw_content_logged": {"const": false},
+    "secrets_logged": {"const": false},
+    "production_key_management_validated": {"const": false}
+  }
+}
