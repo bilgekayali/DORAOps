@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/bilgekayali/DORAOps/schemas/security-observation.schema.json",
+  "title": "DORAOps Security Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "observed_at",
+    "event_type",
+    "entity_id",
+    "principal_id",
+    "outcome",
+    "correlation_id",
+    "artifact_type",
+    "raw_content_logged",
+    "secrets_logged",
+    "production_observability_validated"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "event_type": {"type": "string", "minLength": 1},
+    "entity_id": {"type": "string", "minLength": 1},
+    "principal_id": {"type": "string", "minLength": 1},
+    "outcome": {"type": "string", "minLength": 1},
+    "correlation_id": {"type": "string", "minLength": 1},
+    "artifact_type": {"type": ["string", "null"]},
+    "raw_content_logged": {"const": false},
+    "secrets_logged": {"const": false},
+    "production_observability_validated": {"const": false}
+  }
+}
