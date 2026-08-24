@@ -62,8 +62,9 @@ jobs:
               PortfolioAssuranceRegistry,
               PortfolioAssuranceSnapshot,
           )
-          assert doraops.__version__ == "0.4.0"
-          assert doraops.RELEASE_VERSION == "0.4.0"
+          from doraops.security import IdentityPolicy, TenantContext
+          assert doraops.__version__ == "0.5.0"
+          assert doraops.RELEASE_VERSION == "0.5.0"
           assert RecoveryObjectiveProfile is not None
           assert GovernanceDossierBuilder is not None
           assert DependencyImpactSnapshot is not None
@@ -74,6 +75,8 @@ jobs:
           assert AssuranceState is not None
           assert PortfolioAssuranceRegistry is not None
           assert PortfolioAssuranceSnapshot is not None
+          assert IdentityPolicy is not None
+          assert TenantContext is not None
           assert hasattr(GovernanceDossierBuilder, "add_incident_reporting")
           print(doraops.__version__)
           PY
