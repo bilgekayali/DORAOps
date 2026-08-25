@@ -9,6 +9,7 @@ import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
+import doraops
 from doraops import GovernanceDossierBuilder, GovernanceError, dossier_document
 from doraops.canonical import canonical_json
 from doraops.release_evidence import (
@@ -33,6 +34,7 @@ from tests.test_dossier import governed_risk_fixture
 
 
 SOURCE_REVISION = "a" * 40
+PACKAGE_VERSION = doraops.__version__
 
 
 def _dossier_document(source_revision: str = SOURCE_REVISION):
@@ -109,15 +111,15 @@ def test_regulatory_evidence_module_never_handles_private_signing_keys() -> None
 
 def test_provenance_and_release_manifest_verify_exact_artifact_bytes() -> None:
     wheel_bytes = b"reference-wheel-bytes"
-    wheel = descriptor_from_bytes("doraops-0.5.0-py3-none-any.whl", wheel_bytes, "application/vnd.python.wheel")
-    sbom = build_dependency_sbom("doraops", "0.5.0", (("jsonschema", "4.26.0"), ("cryptography", "46.0.7")))
+    wheel = descriptor_from_bytes(f"doraops-{PACKAGE_VERSION}-py3-none-any.whl", wheel_bytes, "application/vnd.python.wheel")
+    sbom = build_dependency_sbom("doraops", PACKAGE_VERSION, (("jsonschema", "4.26.0"), ("cryptography", "46.0.7")))
     sbom_bytes = (canonical_json(sbom) + "\n").encode("utf-8")
-    sbom_path = "doraops-0.5.0.dependencies.cdx.json"
+    sbom_path = f"doraops-{PACKAGE_VERSION}.dependencies.cdx.json"
 
     provenance = BuildProvenance(
         schema_version=PROVENANCE_SCHEMA_VERSION,
         package_name="doraops",
-        package_version="0.5.0",
+        package_version=PACKAGE_VERSION,
         source_revision=SOURCE_REVISION,
         builder_id="github-actions",
         build_type="https://doraops.dev/build/python-wheel/v1",
@@ -131,7 +133,7 @@ def test_provenance_and_release_manifest_verify_exact_artifact_bytes() -> None:
     provenance_value = provenance_document(provenance)
     assert verify_provenance_document(provenance_value) == provenance_value["provenance_digest"]
     provenance_bytes = (canonical_json(provenance_value) + "\n").encode("utf-8")
-    provenance_path = "doraops-0.5.0.provenance.json"
+    provenance_path = f"doraops-{PACKAGE_VERSION}.provenance.json"
 
     artifacts = tuple(sorted((
         wheel,
@@ -141,7 +143,7 @@ def test_provenance_and_release_manifest_verify_exact_artifact_bytes() -> None:
     manifest = ReleaseEvidenceManifest(
         schema_version=RELEASE_EVIDENCE_SCHEMA_VERSION,
         package_name="doraops",
-        package_version="0.5.0",
+        package_version=PACKAGE_VERSION,
         source_revision=SOURCE_REVISION,
         artifacts=artifacts,
         provenance_path=provenance_path,
@@ -161,17 +163,17 @@ def test_release_evidence_rejects_path_traversal_and_claim_inflation() -> None:
     with pytest.raises(GovernanceError, match="parent segments"):
         descriptor_from_bytes("../secret", b"x", "application/octet-stream")
 
-    sbom = build_dependency_sbom("doraops", "0.5.0", (("jsonschema", "4.26.0"),))
+    sbom = build_dependency_sbom("doraops", PACKAGE_VERSION, (("jsonschema", "4.26.0"),))
     sbom["doraops_nonclaims"]["vulnerability_assessment_performed"] = True
     with pytest.raises(GovernanceError, match="non-claims"):
-        verify_dependency_sbom(sbom, expected_package_name="doraops", expected_package_version="0.5.0")
+        verify_dependency_sbom(sbom, expected_package_name="doraops", expected_package_version=PACKAGE_VERSION)
 
     wheel = descriptor_from_bytes("wheel.whl", b"x", "application/vnd.python.wheel")
     with pytest.raises(GovernanceError, match="formal attestation"):
         ReleaseEvidenceManifest(
             schema_version=RELEASE_EVIDENCE_SCHEMA_VERSION,
             package_name="doraops",
-            package_version="0.5.0",
+            package_version=PACKAGE_VERSION,
             source_revision=SOURCE_REVISION,
             artifacts=(
                 descriptor_from_bytes("a.json", b"{}", "application/json"),
@@ -196,7 +198,7 @@ def test_v06_schemas_accept_generated_reference_documents() -> None:
 
     wheel_bytes = b"wheel"
     wheel = descriptor_from_bytes("wheel.whl", wheel_bytes, "application/vnd.python.wheel")
-    sbom = build_dependency_sbom("doraops", "0.5.0", (("jsonschema", "4.26.0"),))
+    sbom = build_dependency_sbom("doraops", PACKAGE_VERSION, (("jsonschema", "4.26.0"),))
     sbom_schema = json.loads((root / "dependency-sbom.schema.json").read_text())
     jsonschema.Draft202012Validator(sbom_schema).validate(sbom)
     sbom_bytes = (canonical_json(sbom) + "\n").encode()
@@ -204,7 +206,7 @@ def test_v06_schemas_accept_generated_reference_documents() -> None:
     provenance = BuildProvenance(
         schema_version=PROVENANCE_SCHEMA_VERSION,
         package_name="doraops",
-        package_version="0.5.0",
+        package_version=PACKAGE_VERSION,
         source_revision=SOURCE_REVISION,
         builder_id="builder",
         build_type="python-wheel",
@@ -227,7 +229,7 @@ def test_v06_schemas_accept_generated_reference_documents() -> None:
     manifest = release_manifest_document(ReleaseEvidenceManifest(
         schema_version=RELEASE_EVIDENCE_SCHEMA_VERSION,
         package_name="doraops",
-        package_version="0.5.0",
+        package_version=PACKAGE_VERSION,
         source_revision=SOURCE_REVISION,
         artifacts=artifacts,
         provenance_path="provenance.json",
