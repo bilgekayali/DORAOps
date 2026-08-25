@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/control-evidence-assessment.schema.json",
+  "title": "DORAOps Control Evidence Assessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "matrix_digest", "assessed_at", "controls", "represented_control_count", "gap_control_count",
+    "dora_compliance_determined", "legal_applicability_determined",
+    "supervisory_acceptance_determined", "requires_human_review", "schema_version"
+  ],
+  "properties": {
+    "matrix_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "assessed_at": {"type": "integer", "minimum": 0},
+    "controls": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["control_id", "state", "represented_evidence_types", "missing_evidence_types", "artifact_digests"],
+        "properties": {
+          "control_id": {"type": "string", "minLength": 1},
+          "state": {"enum": ["represented", "gap"]},
+          "represented_evidence_types": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "missing_evidence_types": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "artifact_digests": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+        }
+      }
+    },
+    "represented_control_count": {"type": "integer", "minimum": 0},
+    "gap_control_count": {"type": "integer", "minimum": 0},
+    "dora_compliance_determined": {"const": false},
+    "legal_applicability_determined": {"const": false},
+    "supervisory_acceptance_determined": {"const": false},
+    "requires_human_review": {"const": true},
+    "schema_version": {"const": "doraops-control-evidence-assessment.v1"}
+  }
+}
