@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/regulatory-evidence-envelope.schema.json",
+  "title": "DORAOps signed regulatory evidence envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["statement", "signature"],
+  "properties": {
+    "signature": {"type": "string", "pattern": "^[A-Za-z0-9+/]{86}==$"},
+    "statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "algorithm", "signature_scope", "dossier_digest", "entity_id", "release_version", "source_revision", "signer_id", "key_id", "signed_at", "purpose", "dora_compliance_determined", "supervisory_acceptance_determined"],
+      "properties": {
+        "schema_version": {"const": "doraops-regulatory-evidence-signature.v1"},
+        "algorithm": {"const": "Ed25519"},
+        "signature_scope": {"const": "canonical-json-v1"},
+        "dossier_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "entity_id": {"type": "string", "minLength": 1},
+        "release_version": {"type": "string", "minLength": 1},
+        "source_revision": {"type": "string", "minLength": 1},
+        "signer_id": {"type": "string", "minLength": 1},
+        "key_id": {"type": "string", "minLength": 1},
+        "signed_at": {"type": "integer", "minimum": 0},
+        "purpose": {"type": "string", "minLength": 1},
+        "dora_compliance_determined": {"const": false},
+        "supervisory_acceptance_determined": {"const": false}
+      }
+    }
+  }
+}

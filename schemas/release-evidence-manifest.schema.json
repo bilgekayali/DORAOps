@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/release-evidence-manifest.schema.json",
+  "title": "DORAOps release evidence manifest document",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest", "manifest_digest"],
+  "properties": {
+    "manifest_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "package_name", "package_version", "source_revision", "artifacts", "provenance_path", "sbom_path", "formal_release_attested", "production_readiness_determined", "dora_compliance_determined"],
+      "properties": {
+        "schema_version": {"const": "doraops-release-evidence-manifest.v1"},
+        "package_name": {"type": "string", "minLength": 1},
+        "package_version": {"type": "string", "minLength": 1},
+        "source_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "artifacts": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/artifact"}},
+        "provenance_path": {"type": "string", "minLength": 1},
+        "sbom_path": {"type": "string", "minLength": 1},
+        "formal_release_attested": {"const": false},
+        "production_readiness_determined": {"const": false},
+        "dora_compliance_determined": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "size", "media_type"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*\\\\).+$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "size": {"type": "integer", "minimum": 0},
+        "media_type": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

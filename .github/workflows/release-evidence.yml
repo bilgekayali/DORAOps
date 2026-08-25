@@ -1,0 +1,87 @@
+name: Release Evidence Integrity
+
+on:
+  push:
+    branches:
+      - main
+      - "agent/**"
+    paths:
+      - "src/doraops/release_evidence.py"
+      - "scripts/build_release_evidence_preview.py"
+      - "schemas/regulatory-evidence-envelope.schema.json"
+      - "schemas/build-provenance.schema.json"
+      - "schemas/dependency-sbom.schema.json"
+      - "schemas/release-evidence-manifest.schema.json"
+      - "tests/test_release_evidence.py"
+      - "pyproject.toml"
+      - ".github/workflows/release-evidence.yml"
+  pull_request:
+    paths:
+      - "src/doraops/release_evidence.py"
+      - "scripts/build_release_evidence_preview.py"
+      - "schemas/regulatory-evidence-envelope.schema.json"
+      - "schemas/build-provenance.schema.json"
+      - "schemas/dependency-sbom.schema.json"
+      - "schemas/release-evidence-manifest.schema.json"
+      - "tests/test_release_evidence.py"
+      - "pyproject.toml"
+      - ".github/workflows/release-evidence.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  release-evidence-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install package and build dependencies
+        run: |
+          python -m pip install --upgrade pip build
+          python -m pip install -e '.[dev]'
+      - name: Run v0.6 release-evidence tests
+        run: python -m pytest tests/test_release_evidence.py -q
+      - name: Validate v0.6 evidence schemas
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import jsonschema
+          for name in (
+              "regulatory-evidence-envelope.schema.json",
+              "build-provenance.schema.json",
+              "dependency-sbom.schema.json",
+              "release-evidence-manifest.schema.json",
+          ):
+              payload = json.loads((Path("schemas") / name).read_text(encoding="utf-8"))
+              assert payload["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+              assert payload["additionalProperties"] is False
+              jsonschema.Draft202012Validator.check_schema(payload)
+          PY
+      - name: Verify signing implementation is public-key-only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          source = Path("src/doraops/release_evidence.py").read_text(encoding="utf-8")
+          assert "Ed25519PrivateKey" not in source
+          assert "private_key" not in source
+          PY
+      - name: Build wheel and release-evidence preview
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python -m build --wheel
+          SOURCE_REVISION="${PR_HEAD_SHA:-$GITHUB_SHA}"
+          WHEEL="$(ls dist/*.whl)"
+          python scripts/build_release_evidence_preview.py \
+            --wheel "$WHEEL" \
+            --source-revision "$SOURCE_REVISION" \
+            --output-dir release-preview \
+            --builder-id github-actions \
+            --invocation-id "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          test -s release-preview/doraops-*.dependencies.cdx.json
+          test -s release-preview/doraops-*.provenance.json
+          test -s release-preview/doraops-*.release-evidence.json
