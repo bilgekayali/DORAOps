@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/deployment-control-profile.schema.json",
+  "title": "DORAOps Deployment Control Profile Document",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile", "profile_digest"],
+  "properties": {
+    "profile_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_id", "release_version", "workload_name", "image_reference",
+        "run_as_non_root", "read_only_root_filesystem", "allow_privilege_escalation",
+        "drop_all_linux_capabilities", "seccomp_profile", "automount_service_account_token",
+        "default_deny_egress", "tls_required", "immutable_image_required",
+        "runtime_dependency_install_allowed", "external_secret_injection", "resource_limits_required",
+        "readiness_probe_required", "liveness_probe_required", "backup_restore_test_required",
+        "raw_evidence_logging_allowed", "production_effectiveness_determined", "schema_version"
+      ],
+      "properties": {
+        "profile_id": {"type": "string", "minLength": 1},
+        "release_version": {"type": "string", "minLength": 1},
+        "workload_name": {"type": "string", "minLength": 1},
+        "image_reference": {"type": "string", "pattern": "^[^\\s]+@sha256:[0-9a-f]{64}$"},
+        "run_as_non_root": {"const": true},
+        "read_only_root_filesystem": {"const": true},
+        "allow_privilege_escalation": {"const": false},
+        "drop_all_linux_capabilities": {"const": true},
+        "seccomp_profile": {"const": "RuntimeDefault"},
+        "automount_service_account_token": {"const": false},
+        "default_deny_egress": {"const": true},
+        "tls_required": {"const": true},
+        "immutable_image_required": {"const": true},
+        "runtime_dependency_install_allowed": {"const": false},
+        "external_secret_injection": {"const": true},
+        "resource_limits_required": {"const": true},
+        "readiness_probe_required": {"const": true},
+        "liveness_probe_required": {"const": true},
+        "backup_restore_test_required": {"const": true},
+        "raw_evidence_logging_allowed": {"const": false},
+        "production_effectiveness_determined": {"const": false},
+        "schema_version": {"const": "doraops-deployment-control-profile.v1"}
+      }
+    }
+  }
+}
