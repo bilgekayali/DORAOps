@@ -1,0 +1,131 @@
+{
+  "matrix_id": "dora-eu-reference",
+  "matrix_version": "2026-08-25",
+  "jurisdiction": "EU",
+  "regulation": "Regulation (EU) 2022/2554",
+  "mappings": [
+    {
+      "control_id": "asset_dependency_inventory",
+      "title": "ICT asset and dependency identification",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 8", "topic": "Identification"}],
+      "expected_evidence_types": ["dependency_mapping", "inventory_snapshot_manifest"],
+      "responsible_role": "asset_governance_owner",
+      "verification_method": "deterministic_plus_human_review",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "backup_restore",
+      "title": "Backup, restoration and recovery evidence",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 12", "topic": "Backup policies and restoration and recovery procedures and methods"}],
+      "expected_evidence_types": ["backup_restore_evidence", "recovery_test_evidence"],
+      "responsible_role": "backup_recovery_owner",
+      "verification_method": "evidence_integrity_plus_human_review",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "detection",
+      "title": "ICT anomaly and incident detection",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 10", "topic": "Detection"}],
+      "expected_evidence_types": ["incident_detection_evidence", "monitoring_evidence"],
+      "responsible_role": "monitoring_owner",
+      "verification_method": "evidence_integrity_plus_human_review",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "governance_accountability",
+      "title": "Management body governance and accountability",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 5", "topic": "Governance and organisation"}],
+      "expected_evidence_types": ["governance_policy", "management_body_oversight"],
+      "responsible_role": "management_body",
+      "verification_method": "human_review_required",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "ict_risk_framework",
+      "title": "ICT risk management framework",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 6", "topic": "ICT risk management framework"}],
+      "expected_evidence_types": ["ict_risk_policy", "risk_decision"],
+      "responsible_role": "ict_risk_owner",
+      "verification_method": "deterministic_plus_human_review",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "incident_classification",
+      "title": "ICT-related incident classification",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 18", "topic": "Classification of ICT-related incidents and cyber threats"}],
+      "expected_evidence_types": ["classification_review", "impact_evidence"],
+      "responsible_role": "classification_reviewer",
+      "verification_method": "deterministic_plus_human_review",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "incident_management",
+      "title": "ICT incident management process",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 17", "topic": "ICT-related incident management process"}],
+      "expected_evidence_types": ["classification_readiness", "incident_snapshot"],
+      "responsible_role": "incident_manager",
+      "verification_method": "deterministic_plus_human_review",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "incident_reporting",
+      "title": "Major ICT incident reporting evidence",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 19", "topic": "Reporting of major ICT-related incidents"}],
+      "expected_evidence_types": ["reporting_applicability_decision", "submission_receipt"],
+      "responsible_role": "regulatory_reporting_owner",
+      "verification_method": "evidence_integrity_plus_human_review",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "protection_prevention",
+      "title": "ICT protection and prevention",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 9", "topic": "Protection and prevention"}],
+      "expected_evidence_types": ["control_observation", "security_control_evidence"],
+      "responsible_role": "security_control_owner",
+      "verification_method": "evidence_integrity_plus_human_review",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "resilience_testing",
+      "title": "Digital operational resilience testing programme",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 24", "topic": "General requirements for digital operational resilience testing"}],
+      "expected_evidence_types": ["test_plan", "test_resolution"],
+      "responsible_role": "resilience_testing_owner",
+      "verification_method": "deterministic_plus_human_review",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "response_recovery",
+      "title": "ICT response and recovery",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 11", "topic": "Response and recovery"}],
+      "expected_evidence_types": ["incident_response_evidence", "recovery_assessment"],
+      "responsible_role": "continuity_recovery_owner",
+      "verification_method": "deterministic_plus_human_review",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "third_party_contracts",
+      "title": "ICT third-party contractual provisions",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 30", "topic": "Key contractual provisions"}],
+      "expected_evidence_types": ["contractual_provision_evidence", "exit_plan"],
+      "responsible_role": "contracting_owner",
+      "verification_method": "human_review_required",
+      "applicability_basis": "institution_determined"
+    },
+    {
+      "control_id": "third_party_risk",
+      "title": "ICT third-party risk management",
+      "regulatory_references": [{"source": "Regulation (EU) 2022/2554", "article": "Article 28", "topic": "General principles for sound management of ICT third-party risk"}],
+      "expected_evidence_types": ["dependency_observation", "third_party_register_snapshot"],
+      "responsible_role": "third_party_risk_owner",
+      "verification_method": "deterministic_plus_human_review",
+      "applicability_basis": "institution_determined"
+    }
+  ],
+  "complete_legal_mapping_claimed": false,
+  "dora_compliance_determined": false,
+  "legal_applicability_determined": false,
+  "supervisory_acceptance_determined": false,
+  "requires_human_review": true,
+  "schema_version": "doraops-control-evidence-matrix.v1"
+}

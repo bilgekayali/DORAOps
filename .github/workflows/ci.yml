@@ -56,17 +56,13 @@ jobs:
               ReportingWorkflowAssessment,
               RecoveryObjectiveProfile,
           )
-          from doraops.assurance import (
-              AssurancePolicy,
-              AssuranceState,
-              PortfolioAssuranceRegistry,
-              PortfolioAssuranceSnapshot,
-          )
+          from doraops.assurance import AssurancePolicy, AssuranceState, PortfolioAssuranceRegistry, PortfolioAssuranceSnapshot
           from doraops.security import IdentityPolicy, TenantContext
           from doraops.release_evidence import BuildProvenance, ReleaseEvidenceManifest
           from doraops.operational_controls import DeploymentControlProfile, OperationalControlEvidence
-          assert doraops.__version__ == "0.7.0"
-          assert doraops.RELEASE_VERSION == "0.7.0"
+          from doraops.control_matrix import ControlEvidenceMatrix, ControlEvidenceAssessment
+          assert doraops.__version__ == "0.8.0"
+          assert doraops.RELEASE_VERSION == "0.8.0"
           assert RecoveryObjectiveProfile is not None
           assert GovernanceDossierBuilder is not None
           assert DependencyImpactSnapshot is not None
@@ -83,6 +79,8 @@ jobs:
           assert ReleaseEvidenceManifest is not None
           assert DeploymentControlProfile is not None
           assert OperationalControlEvidence is not None
+          assert ControlEvidenceMatrix is not None
+          assert ControlEvidenceAssessment is not None
           assert hasattr(GovernanceDossierBuilder, "add_incident_reporting")
           print(doraops.__version__)
           PY
