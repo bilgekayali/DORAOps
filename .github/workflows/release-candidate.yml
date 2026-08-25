@@ -1,0 +1,57 @@
+name: Release Candidate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  release-candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install package and test dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Run release-candidate contract tests
+        run: python -m pytest tests/test_release_candidate.py -q
+      - name: Verify frozen API, schema and gate state
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from doraops.release_candidate import verify_release_candidate
+          print(json.dumps(verify_release_candidate(Path('.')), sort_keys=True, indent=2))
+          PY
+      - name: Validate release-candidate JSON documents
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for name in (
+              'stable-api-contract.json',
+              'stable-schema-contract.json',
+              'repository-governance-policy.json',
+              'release-candidate-gate.json',
+          ):
+              payload = json.loads((Path('configs') / name).read_text(encoding='utf-8'))
+              assert isinstance(payload, dict)
+              print(name)
+          PY
+      - name: Build and clean-wheel smoke
+        run: |
+          python -m pip install --upgrade build
+          python -m build --wheel
+          python -m venv /tmp/doraops-rc-wheel
+          /tmp/doraops-rc-wheel/bin/python -m pip install dist/*.whl
+          /tmp/doraops-rc-wheel/bin/python - <<'PY'
+          import doraops
+          from doraops.release_candidate import git_blob_sha1, verify_stable_api_contract
+          assert doraops.__version__ in {'0.9.0', '1.0.0'}
+          assert git_blob_sha1 is not None
+          assert verify_stable_api_contract is not None
+          PY
