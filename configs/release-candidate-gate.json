@@ -1,8 +1,8 @@
 {
-  "gate_version": "1.0-rc1",
+  "gate_version": "1.0",
   "required_release_version": "1.0.0",
-  "candidate_version": "0.9.0",
-  "formal_stable_reference_release_eligible": false,
+  "candidate_version": "1.0.0",
+  "formal_stable_reference_release_eligible": true,
   "checks": {
     "stable_api_contract_frozen": true,
     "stable_schema_contract_frozen": true,
@@ -12,7 +12,7 @@
     "deployment_hardening_gate_defined": true,
     "control_evidence_matrix_gate_defined": true,
     "repository_governance_policy_defined": true,
-    "package_version_is_required_release": false
+    "package_version_is_required_release": true
   },
   "repository_governance_enforcement_verified": false,
   "production_readiness_determined": false,

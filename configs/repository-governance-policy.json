@@ -1,5 +1,5 @@
 {
-  "policy_version": "1.0-rc1",
+  "policy_version": "1.0",
   "target_branch": "main",
   "enforcement_verified": false,
   "pull_request_required": true,
@@ -22,5 +22,5 @@
     "test (3.12)",
     "test (3.13)"
   ],
-  "notes": "Repository-admin enforcement is intentionally reported separately from the versioned reference policy. This policy does not require an independent reviewer for single-maintainer development."
+  "notes": "Repository-admin enforcement is reported separately from the versioned stable-reference policy. This policy intentionally requires zero mandatory reviewers for single-maintainer development."
 }

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-PACKAGE_VERSION = "0.9.0"
+PACKAGE_VERSION = "1.0.0"
 
 
 def apply_release_version() -> None:
