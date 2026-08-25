@@ -64,8 +64,9 @@ jobs:
           )
           from doraops.security import IdentityPolicy, TenantContext
           from doraops.release_evidence import BuildProvenance, ReleaseEvidenceManifest
-          assert doraops.__version__ == "0.6.0"
-          assert doraops.RELEASE_VERSION == "0.6.0"
+          from doraops.operational_controls import DeploymentControlProfile, OperationalControlEvidence
+          assert doraops.__version__ == "0.7.0"
+          assert doraops.RELEASE_VERSION == "0.7.0"
           assert RecoveryObjectiveProfile is not None
           assert GovernanceDossierBuilder is not None
           assert DependencyImpactSnapshot is not None
@@ -80,6 +81,8 @@ jobs:
           assert TenantContext is not None
           assert BuildProvenance is not None
           assert ReleaseEvidenceManifest is not None
+          assert DeploymentControlProfile is not None
+          assert OperationalControlEvidence is not None
           assert hasattr(GovernanceDossierBuilder, "add_incident_reporting")
           print(doraops.__version__)
           PY
