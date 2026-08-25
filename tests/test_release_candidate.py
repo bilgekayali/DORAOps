@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import copy
 import json
 from pathlib import Path
@@ -98,6 +99,12 @@ def test_codeql_workflow_is_present_with_python_analysis():
 
 
 def test_release_candidate_verifier_is_offline():
-    source = (ROOT / "src" / "doraops" / "release_candidate.py").read_text(encoding="utf-8")
-    for forbidden in ("requests", "urllib", "socket", "subprocess", "httpx"):
-        assert forbidden not in source
+    path = ROOT / "src" / "doraops" / "release_candidate.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    banned_modules = {"http", "httpx", "requests", "socket", "subprocess", "urllib"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                assert alias.name.split(".")[0] not in banned_modules, alias.name
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            assert node.module.split(".")[0] not in banned_modules, node.module
