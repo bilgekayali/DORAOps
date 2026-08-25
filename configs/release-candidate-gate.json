@@ -1,0 +1,21 @@
+{
+  "gate_version": "1.0-rc1",
+  "required_release_version": "1.0.0",
+  "candidate_version": "0.9.0",
+  "formal_stable_reference_release_eligible": false,
+  "checks": {
+    "stable_api_contract_frozen": true,
+    "stable_schema_contract_frozen": true,
+    "codeql_workflow_defined": true,
+    "release_evidence_gate_defined": true,
+    "security_boundary_gate_defined": true,
+    "deployment_hardening_gate_defined": true,
+    "control_evidence_matrix_gate_defined": true,
+    "repository_governance_policy_defined": true,
+    "package_version_is_required_release": false
+  },
+  "repository_governance_enforcement_verified": false,
+  "production_readiness_determined": false,
+  "dora_compliance_determined": false,
+  "supervisory_acceptance_determined": false
+}

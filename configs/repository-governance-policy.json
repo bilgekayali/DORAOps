@@ -1,0 +1,26 @@
+{
+  "policy_version": "1.0-rc1",
+  "target_branch": "main",
+  "enforcement_verified": false,
+  "pull_request_required": true,
+  "required_approving_reviews": 0,
+  "dismiss_stale_reviews": false,
+  "require_last_push_approval": false,
+  "conversation_resolution_required": true,
+  "force_pushes_allowed": false,
+  "branch_deletion_allowed": false,
+  "required_workflows": [
+    "CodeQL (python)",
+    "assurance-portfolio-boundary",
+    "control-evidence-matrix",
+    "deployment-hardening",
+    "incident-reporting-boundary",
+    "release-candidate",
+    "release-evidence-integrity",
+    "security-boundary",
+    "test (3.11)",
+    "test (3.12)",
+    "test (3.13)"
+  ],
+  "notes": "Repository-admin enforcement is intentionally reported separately from the versioned reference policy. This policy does not require an independent reviewer for single-maintainer development."
+}

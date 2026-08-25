@@ -1,0 +1,21 @@
+{
+  "contract_version": "1.0-rc1",
+  "release_version": "0.9.0",
+  "frozen_for_v1": true,
+  "schemas": [
+    {"path": "schemas/build-provenance.schema.json", "git_blob_sha1": "0706c29019b38c31f44fdd67c23ca0e5fa06471d"},
+    {"path": "schemas/control-evidence-assessment.schema.json", "git_blob_sha1": "66666c80de916a11a7e51b6b0b74a2829156d8cf"},
+    {"path": "schemas/control-evidence-matrix.schema.json", "git_blob_sha1": "1483b1be30c0d3942ee0787172c4099e737c0689"},
+    {"path": "schemas/dependency-sbom.schema.json", "git_blob_sha1": "e1288f578b12565c4e058a752d00e0d836686887"},
+    {"path": "schemas/deployment-control-profile.schema.json", "git_blob_sha1": "030560c5c4330e69536b6787129274d9ee1d60c9"},
+    {"path": "schemas/entity-assurance-position.schema.json", "git_blob_sha1": "f8105ba8d01caedc274bc133a93e0fd9bfc5fb0e"},
+    {"path": "schemas/governance-dossier.schema.json", "git_blob_sha1": "9536a9bc3d274c8a441778f0826213781c59ffd4"},
+    {"path": "schemas/operational-control-evidence.schema.json", "git_blob_sha1": "1b0e8338a002560baffba9eb49e1e1f84303ee9b"},
+    {"path": "schemas/portfolio-assurance-snapshot.schema.json", "git_blob_sha1": "49b4e12c94e6639bfb61bea8ec1da9769ed3efda"},
+    {"path": "schemas/regulatory-evidence-envelope.schema.json", "git_blob_sha1": "ef9d8730d630ef0f27106a0607fa4dca00966b47"},
+    {"path": "schemas/release-evidence-manifest.schema.json", "git_blob_sha1": "ddb51b4f37fb61e1d785e1bd312f17c27b0169f2"}
+  ],
+  "breaking_changes_require_major_version": true,
+  "production_readiness_determined": false,
+  "dora_compliance_determined": false
+}
