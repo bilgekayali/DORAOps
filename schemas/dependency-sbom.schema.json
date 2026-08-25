@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://doraops.dev/schemas/dependency-sbom.schema.json",
+  "title": "DORAOps deterministic CycloneDX-shaped dependency SBOM",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bomFormat", "specVersion", "version", "metadata", "components", "doraops_nonclaims"],
+  "properties": {
+    "bomFormat": {"const": "CycloneDX"},
+    "specVersion": {"const": "1.6"},
+    "version": {"const": 1},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component"],
+      "properties": {
+        "component": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "name", "version"],
+          "properties": {
+            "type": {"const": "application"},
+            "name": {"type": "string", "minLength": 1},
+            "version": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "name", "version", "purl"],
+        "properties": {
+          "type": {"const": "library"},
+          "name": {"type": "string", "minLength": 1},
+          "version": {"type": "string", "minLength": 1},
+          "purl": {"type": "string", "pattern": "^pkg:pypi/.+@.+$"}
+        }
+      }
+    },
+    "doraops_nonclaims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["complete_transitive_inventory", "vulnerability_assessment_performed"],
+      "properties": {
+        "complete_transitive_inventory": {"const": false},
+        "vulnerability_assessment_performed": {"const": false}
+      }
+    }
+  }
+}
