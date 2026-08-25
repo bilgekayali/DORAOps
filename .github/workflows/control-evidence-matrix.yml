@@ -1,0 +1,51 @@
+name: Control Evidence Matrix
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  control-evidence-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install package and test dependencies
+        run: python -m pip install -e '.[dev]'
+      - name: Run v0.8 control matrix tests
+        run: python -m pytest tests/test_control_matrix.py -q
+      - name: Validate matrix schemas and checked-in reference
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import jsonschema
+          from doraops.control_matrix import verify_matrix_payload
+
+          matrix = json.loads(Path("configs/dora-control-evidence-matrix.json").read_text(encoding="utf-8"))
+          schema = json.loads(Path("schemas/control-evidence-matrix.schema.json").read_text(encoding="utf-8"))
+          assessment = json.loads(Path("schemas/control-evidence-assessment.schema.json").read_text(encoding="utf-8"))
+          jsonschema.Draft202012Validator.check_schema(schema)
+          jsonschema.Draft202012Validator.check_schema(assessment)
+          jsonschema.Draft202012Validator(schema).validate(matrix)
+          print(verify_matrix_payload(matrix))
+          PY
+      - name: Verify no automated compliance scoring contract
+        run: |
+          ! grep -R -E 'compliance_percentage|maturity_score' src/doraops/control_matrix.py configs/dora-control-evidence-matrix.json
+      - name: Clean-wheel control matrix smoke
+        run: |
+          python -m pip install --upgrade build
+          python -m build --wheel
+          python -m venv /tmp/doraops-matrix-wheel
+          /tmp/doraops-matrix-wheel/bin/python -m pip install dist/*.whl
+          /tmp/doraops-matrix-wheel/bin/python - <<'PY'
+          from doraops.control_matrix import ControlEvidenceMatrix, ControlEvidenceAssessment
+          assert ControlEvidenceMatrix is not None
+          assert ControlEvidenceAssessment is not None
+          PY
