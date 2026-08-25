@@ -70,11 +70,7 @@ jobs:
               jsonschema.Draft202012Validator.check_schema(payload)
 
           entity = json.loads(Path("schemas/entity-assurance-position.schema.json").read_text())
-          for field in (
-              "dora_compliance_determined",
-              "operational_resilience_determined",
-              "supervisory_acceptance_determined",
-          ):
+          for field in ("dora_compliance_determined", "operational_resilience_determined", "supervisory_acceptance_determined"):
               assert entity["properties"][field]["const"] is False
           assert entity["properties"]["requires_human_review"]["const"] is True
 
@@ -82,12 +78,7 @@ jobs:
           assert provider["properties"]["legal_concentration_risk_determined"]["const"] is False
 
           snapshot = json.loads(Path("schemas/portfolio-assurance-snapshot.schema.json").read_text())
-          for field in (
-              "dora_compliance_determined",
-              "operational_resilience_determined",
-              "supervisory_acceptance_determined",
-              "legal_concentration_risk_determined",
-          ):
+          for field in ("dora_compliance_determined", "operational_resilience_determined", "supervisory_acceptance_determined", "legal_concentration_risk_determined"):
               assert snapshot["properties"][field]["const"] is False
           assert snapshot["properties"]["requires_human_review"]["const"] is True
           PY
@@ -100,10 +91,7 @@ jobs:
           path = Path("src/doraops/assurance.py")
           source = path.read_text(encoding="utf-8")
           tree = ast.parse(source, filename=str(path))
-          banned_modules = {
-              "asyncio", "ftplib", "http", "httpx", "requests", "socket",
-              "subprocess", "telnetlib", "urllib",
-          }
+          banned_modules = {"asyncio", "ftplib", "http", "httpx", "requests", "socket", "subprocess", "telnetlib", "urllib"}
           banned_calls = {"connect", "deploy", "invoke", "post", "put", "request", "send", "submit", "urlopen"}
           for node in ast.walk(tree):
               if isinstance(node, ast.Import):
@@ -125,8 +113,8 @@ jobs:
           from pathlib import Path
           import doraops
 
-          assert doraops.__version__ == "0.7.0"
-          assert doraops.RELEASE_VERSION == "0.7.0"
+          assert doraops.__version__ == "0.8.0"
+          assert doraops.RELEASE_VERSION == "0.8.0"
           source = Path("src/doraops/assurance.py").read_text(encoding="utf-8")
           markers = (
               'AssuranceState.REVALIDATION_REQUIRED: 4',
