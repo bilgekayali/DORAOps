@@ -2,16 +2,51 @@
 
 **Open operational resilience control plane for DORA ICT risk, incidents, testing, third-party risk and verifiable regulatory evidence.**
 
-DORAOps is an open-source reference architecture for structuring and evidencing Digital Operational Resilience Act governance across ICT-supported business functions, services/processes, information and ICT assets, ICT risk, incidents, resilience testing, continuity/recovery, incident-reporting workflows, ICT third-party dependencies and executive resilience-assurance views.
+DORAOps is an open-source reference architecture for structuring and evidencing Digital Operational Resilience Act governance across ICT-supported business functions, services/processes, information and ICT assets, ICT risk, incidents, resilience testing, continuity/recovery, incident-reporting workflows, ICT third-party dependencies, executive resilience-assurance views and cryptographically verifiable evidence integrity.
 
-Current package boundary: **DORAOps v0.5.0**.
+Current package boundary: **DORAOps v0.6.0**.
 
 > [!IMPORTANT]
-> DORAOps is not a legal-compliance engine, disaster-recovery executor, production failover controller, supervisory reporting service, regulator filing gateway, certification product, legal concentration-risk engine or operational-resilience scoring product. Reference validation does not establish production effectiveness or supervisory acceptance.
+> DORAOps is not a legal-compliance engine, disaster-recovery executor, production failover controller, supervisory reporting service, regulator filing gateway, certification product, legal concentration-risk engine or operational-resilience scoring product. Reference validation and cryptographic integrity do not establish production effectiveness, legal authority or supervisory acceptance.
 
-## v0.5.0 security and financial-entity boundary
+## v0.6.0 signed regulatory evidence and release provenance
 
-v0.5 turns the existing `FinancialEntity.entity_id` governance scope into an explicit reference security boundary:
+v0.6 adds a deterministic integrity layer around governance dossiers and release artifacts:
+
+```text
+verified governance dossier
+  -> canonical regulatory evidence statement
+  -> external Ed25519 signing boundary
+  -> trusted public-key verification
+
+built wheel
+  -> direct-dependency CycloneDX-shaped SBOM
+  -> build provenance
+  -> exact-byte release evidence manifest
+  -> tamper verification
+```
+
+The v0.6 boundary adds:
+
+- canonical regulatory-evidence statements bound to the exact verified governance-dossier SHA-256 digest;
+- signer ID, external key ID, signing time, purpose, entity, DORAOps release and source-revision bindings;
+- external Ed25519 signature assembly and verification using a separately supplied trusted raw public key;
+- no runtime/repository API for generating, loading or using signing private keys;
+- build provenance binding a full Git source revision to builder/invocation identity, source material and exact subject artifact bytes;
+- deterministic CycloneDX-shaped direct-dependency SBOM generation with explicit `complete_transitive_inventory=false` and `vulnerability_assessment_performed=false` non-claims;
+- release-evidence manifests using normalized relative paths, SHA-256, exact byte size and media type for every represented artifact;
+- cross-verification between provenance subjects, release-manifest artifacts, source revision and package identity;
+- fail-closed rejection of path traversal, missing/extra artifacts, byte tampering, package/version drift, source-revision drift, signature tampering and untrusted key IDs;
+- strict Draft 2020-12 evidence schemas and a dedicated Release Evidence Integrity CI gate;
+- a preview builder for wheel + SBOM + provenance + manifest generation and verification.
+
+Cryptographic verification establishes integrity relative to the supplied trusted key and exact represented bytes. It does **not** establish real-world signer authority, legal effect, formal artifact attestation, complete software-composition coverage, DORA compliance or supervisory acceptance.
+
+See [`docs/RELEASE_EVIDENCE.md`](docs/RELEASE_EVIDENCE.md).
+
+## Retained v0.5 security and financial-entity boundary
+
+The v0.5 boundary remains intact:
 
 ```text
 pre-resolved Ed25519 OIDC/JWT
@@ -23,21 +58,9 @@ pre-resolved Ed25519 OIDC/JWT
   -> PostgreSQL RLS deployment reference
 ```
 
-The v0.5 boundary adds:
+It retains EdDSA/Ed25519 JWT verification with separately supplied public keys, issuer/audience/time/MFA/role checks, exact `FinancialEntity.entity_id` binding, explicit `TenantContext`, AES-256-GCM evidence encryption, external key references, secret-free observability and PostgreSQL `ENABLE` + `FORCE ROW LEVEL SECURITY` with a non-superuser `NOBYPASSRLS` application role.
 
-- EdDSA/Ed25519 JWT verification with separately supplied public keys;
-- exact issuer and audience validation, `exp`/optional `nbf`, configured principal/entity/role/MFA claims;
-- fail-closed binding between authenticated context and the governed `FinancialEntity.entity_id`;
-- explicit `TenantContext` for principal, roles, entity scope and token lifetime;
-- AES-256-GCM evidence encryption using 256-bit call-boundary key material and 96-bit nonces;
-- authenticated additional data binding exact entity, artifact type and external key reference;
-- cross-entity decryption rejection before plaintext release;
-- external-only `EvidenceKeyReference` metadata rather than embedded KMS/HSM secrets;
-- metadata-only `SecurityObservation` with raw-content and secret logging structurally disabled;
-- PostgreSQL reference isolation using a non-superuser `NOBYPASSRLS` role plus `ENABLE` and `FORCE ROW LEVEL SECURITY`;
-- strict Draft 2020-12 security schemas and a dedicated Security Boundary CI gate.
-
-The repository does **not** fetch live JWKS, discover an identity provider, perform revocation checks, hold production encryption keys, validate a real KMS/HSM, or prove production PostgreSQL isolation. Those remain environment-specific validation obligations.
+The repository does **not** fetch live JWKS, discover an identity provider, perform revocation checks, hold production encryption keys, validate a real KMS/HSM, or prove production PostgreSQL isolation.
 
 See [`docs/SECURITY_BOUNDARY.md`](docs/SECURITY_BOUNDARY.md).
 
@@ -101,7 +124,7 @@ Dossier states remain:
 - `with_gaps` — evidence is internally consistent but required governance/recovery/reporting/closure inputs are incomplete or breached;
 - `revalidation_required` — a prior result is stale or no longer matches current governed evidence.
 
-The dossier contains an exact inventory snapshot manifest and an outer SHA-256 digest. Offline verification recomputes the outer digest, embedded artifact digests and supported semantic cross-bindings.
+The dossier contains an exact inventory snapshot manifest and an outer SHA-256 digest. Offline verification recomputes the outer digest, embedded artifact digests and supported semantic cross-bindings. v0.6 can additionally bind that verified dossier digest into an externally signed regulatory-evidence statement.
 
 ## CLI
 
@@ -116,6 +139,14 @@ doraops dossier verify governance-dossier.json
 
 `digest` canonicalizes JSON before hashing. `schema` validates Draft 2020-12 schemas. `dossier verify` checks the dossier envelope, embedded artifact digests, aggregate state/findings consistency, inventory snapshot-manifest binding and supported continuity/reporting cross-bindings without network access.
 
+Release-evidence previews are built separately:
+
+```bash
+python scripts/build_release_evidence_preview.py \
+  --wheel dist/doraops-0.6.0-py3-none-any.whl \
+  --source-revision <40-character-git-sha>
+```
+
 ## Regulatory design posture
 
 Primary design inputs include Regulation (EU) 2022/2554 (DORA), Commission Delegated Regulations (EU) 2024/1774 and 2024/1773, Commission Implementing Regulation (EU) 2024/2956, Commission Delegated Regulation (EU) 2025/301, and Commission Implementing Regulation (EU) 2025/302 with Annex I.
@@ -124,9 +155,12 @@ DORAOps maps technical/governance evidence to these sources while deliberately s
 
 ## Explicit non-claims
 
-DORAOps v0.5.0 does **not** by itself establish:
+DORAOps v0.6.0 does **not** by itself establish:
 
 - DORA compliance, certification, legal applicability or supervisory acceptance;
+- real-world signer identity, authorization or legal authority merely because an Ed25519 signature verifies;
+- production signing-key custody, HSM-backed signing or formal build attestation;
+- a complete transitive SBOM, vulnerability assessment or vulnerability-free dependency set;
 - production tenant isolation or production IAM effectiveness;
 - real IdP/JWKS/revocation/key-rotation validation;
 - production KMS/HSM or key-management effectiveness;
@@ -144,12 +178,13 @@ DORAOps v0.5.0 does **not** by itself establish:
 
 - exact financial-entity and governed-snapshot binding;
 - deterministic canonical JSON and SHA-256 evidence;
+- cryptographic integrity separated from signer authority and regulatory conclusions;
 - explicit human criticality, applicability, treatment, classification, recovery, provider and assurance decisions;
-- fail-closed stale, incomplete, conflicting, dangling and cross-scope references;
+- fail-closed stale, incomplete, conflicting, dangling, cross-scope and tampered references;
 - immutable historical evidence rather than silent overwrite;
 - historical verification separated from current eligibility;
 - security context bound to the existing entity governance model rather than a parallel tenant namespace;
-- external key references rather than repository-held production secrets;
+- external key references and separately supplied trusted verification keys rather than repository-held production secrets;
 - qualified or regulatory claims require explicit evidence rather than inference from labels;
 - governance core does not execute production recovery, failover or autonomous regulatory submission.
 
