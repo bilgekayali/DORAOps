@@ -34,6 +34,10 @@ The v1 stable boundary provides:
 
 The stable-reference gate is **eligible=true** at `1.0.0`. Repository governance enforcement is still explicitly recorded as `false` unless separately verified from GitHub repository administration. Production readiness, DORA compliance and supervisory acceptance remain explicitly undetermined.
 
+The separately authorized [`v1.0.0` GitHub publication](https://github.com/bilgekayali/DORAOps/releases/tag/v1.0.0) exists only when every required workflow succeeds on the same current `main` SHA. The publication workflow creates an immutable tag and a no-overwrite release; the source-tree version alone does not prove that publication succeeded. See [`docs/RELEASE_PROCESS.md`](docs/RELEASE_PROCESS.md).
+
+The GitHub Release does not publish a package to a package index, publish a container or deploy a service. Those remain separate, unauthorized actions.
+
 ## Capability history retained in v1
 
 - **v0.8** — DORA source/article/topic → control → expected evidence → accountable role → verification mapping; no automated legal/compliance score.
