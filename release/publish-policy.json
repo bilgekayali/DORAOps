@@ -1,0 +1,38 @@
+{
+  "schema_version": "doraops.github-release-policy.v1",
+  "repository": "bilgekayali/DORAOps",
+  "authorized": true,
+  "authorized_by": "bilgekayali",
+  "authorization_date": "2026-09-01",
+  "authorization_scope": "Owner authorized the v1.0.0 Git tag and GitHub Release after every required exact-main workflow succeeds; package-index publication and deployment remain excluded.",
+  "release_version": "1.0.0",
+  "release_title": "DORAOps v1.0.0 — Stable Reference",
+  "notes_path": "release/v1.0.0-notes.md",
+  "prerelease": false,
+  "package_index_publication_authorized": false,
+  "deployment_authorized": false,
+  "required_workflows": {
+    ".github/workflows/assurance-portfolio.yml": "Resilience Assurance Portfolio Boundary",
+    ".github/workflows/ci.yml": "CI",
+    ".github/workflows/codeql.yml": "CodeQL",
+    ".github/workflows/control-evidence-matrix.yml": "Control Evidence Matrix",
+    ".github/workflows/deployment-hardening.yml": "Deployment Hardening",
+    ".github/workflows/incident-reporting.yml": "Incident Reporting Boundary",
+    ".github/workflows/release-candidate.yml": "Release Candidate",
+    ".github/workflows/release-evidence.yml": "Release Evidence Integrity",
+    ".github/workflows/security-boundary.yml": "Security Boundary"
+  },
+  "required_check_contexts": [
+    "CodeQL (python)",
+    "assurance-portfolio-boundary",
+    "control-evidence-matrix",
+    "deployment-hardening",
+    "incident-reporting-boundary",
+    "release-candidate",
+    "release-evidence-integrity",
+    "security-boundary",
+    "test (3.11)",
+    "test (3.12)",
+    "test (3.13)"
+  ]
+}
