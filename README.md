@@ -9,16 +9,6 @@ Current stable package boundary: **DORAOps v1.0.0**.
 > [!IMPORTANT]
 > DORAOps v1.0.0 denotes a stable package/API/schema reference surface. It is not a legal-compliance certification, production-readiness attestation, supervisory approval, disaster-recovery executor or autonomous regulatory decision maker.
 
-## Executive overview — 30 seconds
-
-**Problem:** Regulated financial entities need to connect ICT risks, incidents, resilience testing and third-party dependencies to consistent assurance evidence.
-
-**Reference solution:** A deterministic DORA-oriented governance/evidence control plane with structured contracts and offline verification.
-
-**Inspect the work:** [Source code](src/) · [Automated tests](tests/) · [Public schemas](schemas/).
-
-**Status and limits:** v1.0.0 **stable reference package**, not proof of regulatory compliance, supervisory approval, real disaster-recovery execution or operational deployment.
-
 ## v1.0.0 stable reference surface
 
 v1.0 promotes the validated v0.9 release candidate without expanding the frozen functional surface:
